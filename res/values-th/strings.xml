@@ -12,10 +12,10 @@
 <!-- APRSdroid activity -->
 <string name="firstrun">คุณต้องกำหนดค่านามเรียกขานและรหัสผ่านของคุณ</string>
 <string name="wrongpasscode">รหัสผ่านไม่ตรงกับนามเรียกขานของคุณ!</string>
-<string name="e_toolong_callsign">Your callsign is too long for Packet Radio!</string>
+<string name="e_toolong_callsign">สัญญาณเรียกขานยาวเกินไปสำหรับ packet radio</string>
 <string name="anon_warning">หากไม่มีรหัสผ่าน ข้อมูลของคุณจะไม่ถูกเผยแพร่!</string>
 <string name="mininterval">ปรับค่าขั้นต่ำ 1นาที!</string>
-<string name="singlelog">Send Position</string>
+<string name="singlelog">ส่งพิกัด</string>
 <string name="startlog">เริ่มทำงาน</string>
 <string name="stoplog">หยุดทำงาน</string>
 
@@ -56,7 +56,7 @@
 <string name="service_start">APRS เริ่มทำงาน : %1$s, %2$s.</string>
 <string name="service_stop">APRS หยุดทำงาน.</string>
 <string name="service_no_location">แต่คุณต้องเปิดการใช้งานจีพีเอสหรือที่อยู่เครือข่ายสำหรับ APRSdroid ทำงานอย่างถูกต้อง!</string>
-<string name="service_sm_no_gps">SmartBeaconing™ requires GPS!</string>
+<string name="service_sm_no_gps">SmartBeaconing ต้องมีข้อมูล GPS</string>
 <!-- service result codes -->
 <string name="post_error">ผิดพลาด</string>
 <string name="post_incmg">ได้รับ</string>
@@ -68,11 +68,11 @@
 <string name="fr_title">ยินดีต้อนรับสู่ APRSdroid!</string>
 <string name="fr_text">ซอฟต์แวร์นี้อนุญาตให้ใช้กับนักวิทยุสมัครเล่นที่มีใบอนุญาติแล้วเท่านั้น</string>
 <string name="fr_text2">คุณจำเป็นต้องใส่นามเรียกขานของคุณเพื่อใช้ซอฟต์แวร์นี้ ในต้องการส่งต่อข้อมูลของคุณ และในเซิร์ฟเวอร์ APRS-IS จะต้องระบุรหัสผ่านเท่านั้น</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_text3">จำเป็นต้อง เมื่อใช้งาน APRS ผ่านระบบ Internet</string>
 
 <!-- about dialog -->
-<string name="ad_title">เกี่ยวกับ APRSdroid% v s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
+<string name="ad_title">เกี่ยวกับ APRSdroid v%s</string>
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
@@ -94,7 +94,7 @@
 	http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 	</string>
 <string name="ad_thanks">ขอบคุณ</string>
-<string name="ad_thanks_0">My YL ♥♥♥</string>
+<string name="ad_thanks_0">สุภาพสตรีของข้าพเจ้า</string>
 <string name="ad_thanks_1">Michael, DO3BOX: idea</string>
 <string name="ad_thanks_2">Dirk, DB5OY: motivation and support</string>
 <string name="ad_thanks_3">Bastian, DB1BM: AFSK implementation</string>
@@ -141,7 +141,7 @@
 <string name="p_callsign_summary">นามเรียกขานวิทยุสมัครเล่นของคุณ</string>
 <string name="p_callsign_entry">ใส่นามเรียกขาน</string>
 <string name="p_passcode">รหัสผ่าน APRS-IS</string>
-<string name="p_passcode_summary">APRS-IS validation passcode</string>
+<string name="p_passcode_summary">รหัสผ่านเพื่อเข้าใช้งาน APRS-IS</string>
 <string name="p_passcode_entry">ใส่รหัสผ่านของท่าน</string>
 <string name="p_passreq">ต้องการรหัสผ่าน</string>
 <string name="p_passreq_summary">ต้องการรหัสผ่าน APRS-IS  ออนไลน์</string>
@@ -365,6 +365,7 @@
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
+  E20FMC https://launchpad.net/~e20fmc
   Georg Lukas https://launchpad.net/~ge0rg
   HS5TQA https://launchpad.net/~somkiat
   Peemphol Tansakul https://launchpad.net/~ptansakul
@@ -427,11 +428,11 @@
 
 <!-- (USB) Serial TNC settings -->
 <string name="p_serial_baudrate">Baud Rate</string>
-<string name="p_serial_baudrate_summary">Data rate of the serial port</string>
+<string name="p_serial_baudrate_summary">ความเร็วในการรับส่งข้อมูลของ serial port</string>
 <!-- (USB) Serial Errors -->
-<string name="p_serial_unsupported">Unsupported serial port!</string>
-<string name="p_serial_noperm">No permission for USB device!</string>
-<string name="p_serial_notfound">No USB device found!</string>
+<string name="p_serial_unsupported">ไม่รองรับ serial port</string>
+<string name="p_serial_noperm">ไม่อนุญาตให้ใช้อุปกรณ์ USB</string>
+<string name="p_serial_notfound">ไม่พบอุปกรณ์ USB</string>
 
-<string name="no_perm_text">The following permissions are required:</string>
+<string name="no_perm_text">จำเป็นต้องอนุญาตหัวข้อดังต่อไปนี้</string>
 </resources>

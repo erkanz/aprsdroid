@@ -72,7 +72,7 @@
 
 <!-- about dialog -->
 <string name="ad_title">Info APRSdroid v%s kohta</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
@@ -106,7 +106,7 @@
 
 <!-- map view -->
 <string name="map_overlays">Overlays</string>
-<string name="map_google">Google: Map</string>
+<string name="map_google">google: kaart</string>
 <string name="map_satellite">Google: Satellite</string>
 <string name="map_osm">OpenStreetMap.org</string>
 <!-- intended use is in map style menu: "file name of offline map (Offline)" -->
@@ -171,7 +171,7 @@
 <string name="p_symbol">APRS sümbol</string>
 <string name="p_symbol_summary">Teie sümbol kaardile</string>
 <string name="p_symbol_overlay">Overlay:</string>
-<string name="p_symbol_result">Result:</string>
+<string name="p_symbol_result">Tulemus:</string>
 <string name="p_frequency">Voice frequency</string>
 <string name="p_frequency_summary">Your voice frequency [MHz]</string>
 <string name="p_status">Kommentaari väli</string>
@@ -180,7 +180,7 @@
 <string name="p__connection">APRS ühendus</string>
 <string name="p_conntype">Ühenduse protokoll</string>
 <string name="p_conntype_entry">Vali ühenduse protokoll</string>
-<string name="p_link">Connection Type</string>
+<string name="p_link">Ühenduse tüüp</string>
 <string name="p_link_entry">Choose the link type</string>
 <string name="p_connsetup">Ühenduse seadistused</string>
 <string name="p_connlog">Ühenduse logimine</string>
@@ -192,7 +192,7 @@
 <string name="p_conn_tnc2">TNC (plaintext TNC2)</string>
 <string name="p_conn_kwd">Kenwood (NMEA waypoint)</string>
 <string name="p_conn_kwd_info">Kenwood setup help</string>
-<string name="p_conn_kwd_gps">Use Android GPS</string>
+<string name="p_conn_kwd_gps">kasutama android gps</string>
 <string name="p_conn_kwd_gps_summary">Forward NMEA sentences to radio</string>
 <string name="p_conn_kwd_gps_debug">Display GPS in log</string>
 <string name="p_conn_kwd_gps_debug_summary">Show raw NMEA in APRSdroid</string>
@@ -211,7 +211,7 @@
 <!-- manual position -->
 <string name="p_source_lat">Laiuskraad</string>
 <string name="p_source_lon">Pikkuskraad</string>
-<string name="p_source_coord">Coordinate</string>
+<string name="p_source_coord">Koordinaat</string>
 <!-- select your position from a map -->
 <string name="p_source_from_map">Choose on map</string>
 <string name="p_source_from_map_save">Save position</string>
@@ -280,7 +280,7 @@
 <!-- array of GPS precisions -->
 <string name="p_gps_always">High (Always on)</string>
 <string name="p_gps_med">Medium</string>
-<string name="p_gps_low">Low</string>
+<string name="p_gps_low">Madal</string>
 <string name="p_keepscreen">Hoia ekraan aktiivne</string>
 <string name="p_keepscreen_summary">Ära lülita ekraani välja kui APRSdroid on esiplaanil</string>
 
@@ -305,7 +305,7 @@
 <string name="p_dgp_ring_summary">Tone for digipeated packets</string>
 
 <string name="got_digipeated">Digipeated by %1$s: %2$s</string>
-<string name="status_linkoff">Error: %s</string>
+<string name="status_linkoff">Viga: %s</string>
 <string name="status_linkon">Connected: %s</string>
 
 <!-- AFSK settings -->
@@ -366,6 +366,7 @@
 
 <string name="translator_credits">Launchpad Contributions:
   Georg Lukas https://launchpad.net/~ge0rg
+  Jaakko Petrelius https://launchpad.net/~operaserver
   Kuido Lehtmets https://launchpad.net/~kuido-lehtmets</string>
 
 <!-- Bluetooth TNC settings -->

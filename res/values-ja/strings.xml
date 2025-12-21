@@ -72,7 +72,7 @@
 
 <!-- about dialog -->
 <string name="ad_title">APRSdroidについて v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
@@ -118,8 +118,8 @@
 <string name="quit">終了</string>
 <string name="preferences">設定</string>
 <!-- preferences -->
-<string name="profile_load">Load profile...</string>
-<string name="profile_export">Export profile...</string>
+<string name="profile_load">プロファイルを読み込む...</string>
+<string name="profile_export">プロファイルをエクスポートする...</string>
 <string name="p__ham">無線局情報設定</string>
 <string name="p_callsign">コールサイン</string>
 <string name="p_callsign_nossid">コールサイン (SSID抜き)</string>
@@ -198,7 +198,7 @@
 <string name="p_source_lon">経度</string>
 <string name="p_source_coord">座標</string>
 <!-- select your position from a map -->
-<string name="p_source_from_map">Choose on map</string>
+<string name="p_source_from_map">マップから選ぶ</string>
 <string name="p_source_from_map_save">Save position</string>
 <string name="p_source_get_last">最後のGPS位置を使用</string>
 <string name="p_source_auto">自動位置情報取得・送信</string>
@@ -352,7 +352,8 @@
 <string name="translator_credits">Launchpad Contributions:
   Georg Lukas https://launchpad.net/~ge0rg
   Yoshihisa Tanda https://launchpad.net/~jn4oqt
-  Yoshikazu AKAGI https://launchpad.net/~7k4owm</string>
+  Yoshikazu AKAGI https://launchpad.net/~7k4owm
+  scratch3644583 https://launchpad.net/~scratch3644583</string>
 
 <!-- Bluetooth TNC settings -->
 <string name="p_bt_client">クライアント(子機)モード</string>
@@ -385,7 +386,7 @@
 <!-- connecting to [device name] channel [bluetooth channel id] -->
 <string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
 <string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
+<string name="bt_reconnecting">3秒以内に再接続します…</string>
 
 
 <string name="afsk_info_sco_req">Bluetooth(SCO)リンク要求</string>

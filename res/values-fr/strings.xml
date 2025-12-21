@@ -68,11 +68,15 @@
 <string name="fr_title">Bienvenue dans APRSdroid !</string>
 <string name="fr_text">Ce logiciel ne peut être utilisé que par un radioamateur licencié !</string>
 <string name="fr_text2">Vous devez entrer votre indicatif pour utiliser ce logiciel. Pour transférer vos paquets, un code d\'accès au réseau APRS-IS est également nécessaire.</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_text3">Requis seulement pour APRS via internet:</string>
 
 <!-- about dialog -->
 <string name="ad_title">À propos d\'APRSdroid v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n https://aprsdroid.org \n\n APRS® est une marque déposée par Bob Bruninga (WB4APR)</string>
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
+	https://aprsdroid.org
+	\n\n
+	APRS® is a registered trademark of Bob Bruninga (WB4APR)
+</string>
 <string name="ad_gpl">Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la Licence Publique Générale GNU publiée par la Free Software Foundation ; soit la version 2 de la Licence, ou (à votre choix) toute version ultérieure. \n\n Ce programme est distribué dans l\'espoir qu\'il sera utile, mais SANS AUCUNE GARANTIE : sans même la garantie implicite de COMMERCIALISATION ou D\'ADAPTATION À UN USAGE PARTICULIER. Voir la Licence Publique Générale GNU pour plus de détails. \n\n Vous devriez avoir reçu un exemplaire de la Licence Publique Générale GNU avec ce programme, sinon, écrivez à la Free Software Foundation, Inc, 51 rue Franklin, Fifth Floor, Boston, MA 02110-1301, USA. \n\n http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</string>
 <string name="ad_thanks">Merci à :</string>
 <string name="ad_thanks_0">Ma femme ♥♥♥</string>
@@ -194,8 +198,8 @@
 <string name="p_source_lon">Longitude</string>
 <string name="p_source_coord">Coordonnées</string>
 <!-- select your position from a map -->
-<string name="p_source_from_map">Choose on map</string>
-<string name="p_source_from_map_save">Save position</string>
+<string name="p_source_from_map">Indiquer votre position sur la carte</string>
+<string name="p_source_from_map_save">Enregistrer la position</string>
 <string name="p_source_get_last">Utilisation de la dernière position GPS connue</string>
 <string name="p_source_auto">Envoi automatique</string>
 <string name="p_source_auto_summary">Envoi périodique de la position</string>
@@ -336,13 +340,13 @@
 <string name="p_themefile_choose">Choisir le fichier de thème</string>
 <string name="themefile_error">Erreur de chargement du fichier de thème %s!</string>
 
-<string name="kbdnav_title">Keyboard Navigation</string>
+<string name="kbdnav_title">Naviger avec le clavier</string>
 <!-- keyboard navigation info -->
 <string-array name="kbdnav_lines">
-	<item>move map</item>
+	<item>Bougez la carte</item>
 	<item>zoom</item>
 	<item>menu</item>
-	<item>select</item>
+	<item>Sélectionner</item>
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
@@ -357,12 +361,14 @@
   Georg Lukas https://launchpad.net/~ge0rg
   Jean-Marc https://launchpad.net/~m-balthazar
   Jonathan https://launchpad.net/~va2loj
+  Karim BAKKAL https://launchpad.net/~kabak-85
   Olivier Maury https://launchpad.net/~olivier-maury
   Remi Chateauneu https://launchpad.net/~remi-chateauneu
   SILVIO BARLETTA https://launchpad.net/~ik1bqd
   Thomas AIME https://launchpad.net/~f4ilx
   VE2ER https://launchpad.net/~ve2er
   gabaye bruno https://launchpad.net/~f1mbc
+  heedge https://launchpad.net/~heedge
   londumas https://launchpad.net/~helion331990</string>
 
 <!-- Bluetooth TNC settings -->
@@ -390,13 +396,13 @@
 <string name="bt_error_disabled">Veuillez activer le Bluetooth !</string>
 <string name="bt_error_no_tnc">Veuillez paramétrer un TNC Bluetooth</string>
 <string name="bt_error_connect">Impossible de se connecter à %s! Merci d\'éteindre l\'appareil et de fermer les autres connexions Bluetooth.</string>
-<string name="bt_awaiting">Awaiting client…</string>
-<string name="bt_client_connected">Client %s connected.</string>
-<string name="bt_connecting_to_spp">Connecting to SPP service on %s…</string>
+<string name="bt_awaiting">En attente du client...</string>
+<string name="bt_client_connected">Client %s connecté.</string>
+<string name="bt_connecting_to_spp">Connexion au service SPP sur %s</string>
 <!-- connecting to [device name] channel [bluetooth channel id] -->
-<string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
-<string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
+<string name="bt_connecting_to_channel">Coneccté à %s sur le canal %d</string>
+<string name="bt_connected">Connecté au TNC</string>
+<string name="bt_reconnecting">Reconnexion dans 3s ...</string>
 
 
 <string name="afsk_info_sco_req">Requête d\'un lien bluetooth SCO...</string>

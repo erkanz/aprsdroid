@@ -68,11 +68,11 @@
 <string name="fr_title">Benvenuto su APRSdroid!</string>
 <string name="fr_text">Questo software può essere usato solo se si è in possesso di Autorizzazione Generale all\'Impianto di una  di Stazione di Radioamatore rilasciata dal Ministero delle Comunicazioni.</string>
 <string name="fr_text2">Devi inserire il tuo nominativo per usare questo software.Per trasmettere è richiesto ,inoltre, la password APRS-IS.</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_text3">Necessario solo per APRS via Internet:</string>
 
 <!-- about dialog -->
 <string name="ad_title">Informazioni programma  APRSdroid v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
@@ -118,8 +118,8 @@
 <string name="quit">Termina</string>
 <string name="preferences">Impostazioni</string>
 <!-- preferences -->
-<string name="profile_load">Load profile...</string>
-<string name="profile_export">Export profile...</string>
+<string name="profile_load">Carico il profilo...</string>
+<string name="profile_export">Esporto il profilo...</string>
 <string name="p__ham">Radio Amatore</string>
 <string name="p_callsign">Nominativo</string>
 <string name="p_callsign_nossid">Nominativo (senza SSID)</string>
@@ -198,8 +198,8 @@
 <string name="p_source_lon">Longitudine</string>
 <string name="p_source_coord">Coordinate</string>
 <!-- select your position from a map -->
-<string name="p_source_from_map">Choose on map</string>
-<string name="p_source_from_map_save">Save position</string>
+<string name="p_source_from_map">Seleziona da mappa</string>
+<string name="p_source_from_map_save">Salva posizione</string>
 <string name="p_source_get_last">Usa l\'ultima posizione GPS</string>
 <string name="p_source_auto">Invio Automatico</string>
 <string name="p_source_auto_summary">Controllo periodico invio posizione</string>
@@ -340,13 +340,13 @@
 <string name="p_themefile_choose">Scegli il tema del file</string>
 <string name="themefile_error">Errore caricando il tema del file %s!</string>
 
-<string name="kbdnav_title">Keyboard Navigation</string>
+<string name="kbdnav_title">Naviga da tastiera</string>
 <!-- keyboard navigation info -->
 <string-array name="kbdnav_lines">
-	<item>move map</item>
+	<item>muovi mappa</item>
 	<item>zoom</item>
-	<item>menu</item>
-	<item>select</item>
+	<item>menù</item>
+	<item>seleziona</item>
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
@@ -354,6 +354,7 @@
   IK2RXU https://launchpad.net/~gilandin
   IZ5MSM https://launchpad.net/~iz5msm
   Martino Barbon https://launchpad.net/~martins999
+  Matteo Regazzi https://launchpad.net/~mregazzi
   Maurizio Di Mattia https://launchpad.net/~i0dzr
   Paolo Valentino Mattiolo https://launchpad.net/~in3aqk
   SILVIO BARLETTA https://launchpad.net/~ik1bqd

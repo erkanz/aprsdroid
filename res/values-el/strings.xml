@@ -5,13 +5,13 @@
 <string name="app_prefs">Προτιμήσεις APRSdroid</string>
 <string name="app_map">Χάρτης APRSdroid</string>
 <string name="app_hub">Κόμβος APRSdroid</string>
-<string name="app_log">Ημερολόγιο του APRSdroid</string>
+<string name="app_log">Αρχείο καταγραφής APRSdroid</string>
 <string name="app_sta">Πληροφορίες Σταθμού</string>
 <string name="app_messages">Μηνύματα</string>
-<string name="app_messages_clear">Διαγραφή Μηνυμάτων</string>
+<string name="app_messages_clear">Εκκαθάριση μηνυμάτων</string>
 <!-- APRSdroid activity -->
-<string name="firstrun">Πρέπει να ρυθμίσετε το APRSdroid με το διακριτικό και τον κωδικό πρόσβασής σας!</string>
-<string name="wrongpasscode">Ο κωδικός πρόσβασης σας δεν αντιστοιχεί στο διακριτικό κλήσης σας!</string>
+<string name="firstrun">Πρέπει να διαμορφώσετε το APRSdroid με το διακριτικό κλήσης και τον κωδικό πρόσβασής σας!</string>
+<string name="wrongpasscode">Ο κωδικός πρόσβασής σας δεν ταιριάζει με το διακριτικό σας!</string>
 <string name="e_toolong_callsign">Το διακριτικό σας είναι πολύ μεγάλο για το Packet Radio!</string>
 <string name="anon_warning">Χωρίς κωδικό πρόσβασης, οι αναφορές σας δεν θα μεταδοθούν!</string>
 <string name="mininterval">Ελάχιστος χρόνος ενημέρωσης είναι 1 λεπτό!</string>
@@ -68,11 +68,15 @@
 <string name="fr_title">Καλώς ήλθατε στο APRSdroid!</string>
 <string name="fr_text">Η χρήση της εφαρμογής επιτρέπεται μόνο σε αδειούχους ραδιοερασιτέχνες!</string>
 <string name="fr_text2">Πρέπει να εισάγετε το διακριτικό σας για να χρησιμοποιήσετε αυτό το λογισμικό. Για να προωθήσετε πακέτα σας, απαιτείται επίσης ένας κωδικός πρόσβασης APRS-IS.</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_text3">Απαιτείται μόνο για APRS μέσω Διαδικτύου:</string>
 
 <!-- about dialog -->
 <string name="ad_title">Σχετικά με APRSdroid v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n https://aprsdroid.org \n\n Το APRS® είναι σήμα κατατεθέν του Bob Bruninga (WB4APR)</string>
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
+	https://aprsdroid.org
+	\n\n
+	APRS® is a registered trademark of Bob Bruninga (WB4APR)
+</string>
 <string name="ad_gpl">Αυτό το πρόγραμμα είναι ελεύθερο λογισμικό; Μπορείτε να το αναδιανέμετε ή/και να το τροποποιήσετε υπό τους όρους της GNU General Public License όπως αυτή δημοσιεύεται από το Ίδρυμα Ελεύθερου Λογισμικού; είτε της έκδοσης 2 της Άδειας, είτε (κατ\'επιλογή σας) οποιαδήποτε μεταγενέστερη έκδοση. \n\n Αυτό το πρόγραμμα διανέμεται με την ελπίδα ότι θα είναι χρήσιμο, αλλά ΧΩΡΙΣ ΚΑΜΙΑ ΕΓΓΥΗΣΗ; χωρίς καν την υπονοούμενη εγγύηση της ΕΜΠΟΡΕΥΣΙΜΟΤΗΤΑΣ ή ΚΑΤΑΛΛΗΛΟΤΗΤΑΣ ΓΙΑ ΣΥΓΚΕΚΡΙΜΕΝΟ ΣΚΟΠΟ. Δείτε την GNU Γενική Άδεια Δημόσιας Χρήσης για περισσότερες λεπτομέρειες. \n\n Θα πρέπει να έχετε λάβει ένα αντίγραφο της GNU General Public License μαζί με αυτό το πρόγραμμα; αν όχι, γράψτε στο Ίδρυμα Ελεύθερου Λογισμικού, Inc, 51 Franklin Street, πέμπτο όροφο, Boston, MA 02110-1301, ΗΠΑ. \n\n http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</string>
 <string name="ad_thanks">Ευχαριστίες σε:</string>
 <string name="ad_thanks_0">Η YL μου ♥♥♥</string>
@@ -194,8 +198,8 @@
 <string name="p_source_lon">Γεωγραφικό Μήκος</string>
 <string name="p_source_coord">Συντεταγμένη</string>
 <!-- select your position from a map -->
-<string name="p_source_from_map">Choose on map</string>
-<string name="p_source_from_map_save">Save position</string>
+<string name="p_source_from_map">Επιλέξτε στο χάρτη</string>
+<string name="p_source_from_map_save">Αποθήκευση θέσης</string>
 <string name="p_source_get_last">Χρησιμοποιήστε την τελευταία τοποθεσία GPS</string>
 <string name="p_source_auto">Αυτόματη Δημοσίευση</string>
 <string name="p_source_auto_summary">Εκτελέστε περιοδική δημοσίευση θέσης</string>
@@ -336,13 +340,13 @@
 <string name="p_themefile_choose">Διαλέξτε αρχείο θέματος</string>
 <string name="themefile_error">Σφάλμα φόρτωσης αρχείου θέματος %s!</string>
 
-<string name="kbdnav_title">Keyboard Navigation</string>
+<string name="kbdnav_title">Πλοήγηση με πληκτρολόγιο</string>
 <!-- keyboard navigation info -->
 <string-array name="kbdnav_lines">
-	<item>move map</item>
-	<item>zoom</item>
-	<item>menu</item>
-	<item>select</item>
+	<item>μετακίνηση χάρτη</item>
+	<item>μεγέθυνση</item>
+	<item>μενού</item>
+	<item>επιλέγω</item>
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
@@ -377,13 +381,13 @@
 <string name="bt_error_disabled">Παρακαλούμε ενεργοποιήστε το Bluetooth!</string>
 <string name="bt_error_no_tnc">Παρακαλούμε διαμορφώστε το TNC Bluetooth!</string>
 <string name="bt_error_connect">Δεν είναι δυνατή η σύνδεση με τον %s! Παρακαλώ ανάψτε τη συσκευή και κλείστε τις υπόλοιπες συνδέσεις Bluetooth.</string>
-<string name="bt_awaiting">Awaiting client…</string>
-<string name="bt_client_connected">Client %s connected.</string>
-<string name="bt_connecting_to_spp">Connecting to SPP service on %s…</string>
+<string name="bt_awaiting">Αναμονή πελάτη…</string>
+<string name="bt_client_connected">Ο πελάτης %s είναι συνδεδεμένος.</string>
+<string name="bt_connecting_to_spp">Σύνδεση στην υπηρεσία SPP στο %s…</string>
 <!-- connecting to [device name] channel [bluetooth channel id] -->
-<string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
-<string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
+<string name="bt_connecting_to_channel">Σύνδεση στο κανάλι %s %d…</string>
+<string name="bt_connected">Συνδεδεμένο με TNC.</string>
+<string name="bt_reconnecting">Επανασύνδεση σε 3 δευτερόλεπτα…</string>
 
 
 <string name="afsk_info_sco_req">Αίτηση SCO σύνδεσης Bluetooth...</string>

@@ -72,7 +72,7 @@
 
 <!-- about dialog -->
 <string name="ad_title">Om APRSdroid v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
@@ -91,8 +91,8 @@
 
 <!-- map view -->
 <string name="map_overlays">Kortlag</string>
-<string name="map_google">Google: Map</string>
-<string name="map_satellite">Google: Satellite</string>
+<string name="map_google">google: kort</string>
+<string name="map_satellite">google: satellit</string>
 <string name="map_osm">OpenStreetMap.org</string>
 <!-- intended use is in map style menu: "file name of offline map (Offline)" -->
 <string name="map_offline"> %s (Offline)</string>
@@ -199,7 +199,7 @@
 <string name="p_source_coord">Koordinat</string>
 <!-- select your position from a map -->
 <string name="p_source_from_map">Choose on map</string>
-<string name="p_source_from_map_save">Save position</string>
+<string name="p_source_from_map_save">Gem position</string>
 <string name="p_source_get_last">Brug seneste GPS position</string>
 <string name="p_source_auto">Automatisk afsendelse</string>
 <string name="p_source_auto_summary">Send periodisk positionen</string>
@@ -346,13 +346,14 @@
 	<item>move map</item>
 	<item>zoom</item>
 	<item>menu</item>
-	<item>select</item>
+	<item>vælg</item>
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
   Alexandru Csete https://launchpad.net/~alexc
   Finn Leslie https://launchpad.net/~idestrup
   Georg Lukas https://launchpad.net/~ge0rg
+  Jaakko Petrelius https://launchpad.net/~operaserver
   Kim Eggert https://launchpad.net/~kim-s-eggert
   Mads Bahrt https://launchpad.net/~1-mb</string>
 

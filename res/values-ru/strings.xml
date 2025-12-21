@@ -12,7 +12,7 @@
 <!-- APRSdroid activity -->
 <string name="firstrun">Необходимо настроить APRSdroid с вашим позывным и паролем</string>
 <string name="wrongpasscode">Ваш пароль не соответствует вашему позывному</string>
-<string name="e_toolong_callsign">Your callsign is too long for Packet Radio!</string>
+<string name="e_toolong_callsign">Ваш позывной слишком длинный для Пакетного Радио!</string>
 <string name="anon_warning">Ваши рапорты не будут распространяться без пароля!</string>
 <string name="mininterval">Минимальное время обновления 1 минута!</string>
 <string name="singlelog">Отправить местоположение</string>
@@ -68,11 +68,15 @@
 <string name="fr_title">Добро пожаловать в APRSdroid!</string>
 <string name="fr_text">Это приложение только для пользователей имеющих радиолюбительский позывной</string>
 <string name="fr_text2">Необходимо ввести свой позывной, чтобы использовать эту программу. Также для пересылки ваших данных, требуется пароль сервера APRS-IS для вашего позывного.</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_text3">Только нужно для APRS по Интернету:</string>
 
 <!-- about dialog -->
 <string name="ad_title">Об APRSdroid v%s</string>
-<string name="ad_copyright">Copyright © 2009-2021 Георг Лукас (DO1GL)\n http://arpsdroid.org \n\n APRS® является зарегистрированным товарным знаком Боба Брунинга (WB4APR)</string>
+<string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
+	https://aprsdroid.org
+	\n\n
+	APRS® is a registered trademark of Bob Bruninga (WB4APR)
+</string>
 <string name="ad_gpl">Эта программа является свободным программным обеспечением, вы можете распространять и/или модифицировать его на условиях GNU General Public License, опубликованной Free Software Foundation; либо 2-ой версией лицензии, либо (по вашему выбору) любой более поздней версией.  \n\n Эта программа распространяется в надежде, что она будет полезной, но БЕЗ ВСЯКИХ ГАРАНТИЙ. Совершенно не подразумевается гарантия КОММЕРЧЕСКОЙ ЦЕННОСТИ или ПРИГОДНОСТИ ДЛЯ КОНКРЕТНЫХ ЦЕЛЕЙ. Смотрите общественную лицензию GNU General для получения более подробной информации.\n\n Вы должны были получить копию GNU General Public License вместе с этой программой. Если в не получили копии, напишите письмо по адресу Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. \n\n http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</string>
 <string name="ad_thanks">Благодарности:</string>
 <string name="ad_thanks_0">Моей YL ♥♥♥</string>
@@ -87,11 +91,11 @@
 
 <!-- map view -->
 <string name="map_overlays">Слои данных карты</string>
-<string name="map_google">Google: Map</string>
-<string name="map_satellite">Google: Satellite</string>
+<string name="map_google">Google: Карта</string>
+<string name="map_satellite">Google: Спутник</string>
 <string name="map_osm">OpenStreetMap.org</string>
 <!-- intended use is in map style menu: "file name of offline map (Offline)" -->
-<string name="map_offline"> %s (Offline)</string>
+<string name="map_offline">%s (Оффлайн)</string>
 <string name="map_objects">Объекты APRS</string>
 
 <!-- map view -->
@@ -194,8 +198,8 @@
 <string name="p_source_lon">Долгота</string>
 <string name="p_source_coord">Координата</string>
 <!-- select your position from a map -->
-<string name="p_source_from_map">Choose on map</string>
-<string name="p_source_from_map_save">Save position</string>
+<string name="p_source_from_map">Выбрать на карте</string>
+<string name="p_source_from_map_save">Сохранить позицию</string>
 <string name="p_source_get_last">Использовать последнюю позицию, полученную от GPS</string>
 <string name="p_source_auto">Автоматическая отправка</string>
 <string name="p_source_auto_summary">Периодически отправлять позицию</string>
@@ -237,9 +241,9 @@
 <string name="p_sb_slow_rate">Интервал обновления [сек]</string>
 <string name="p_sb_slow_rate_summary">Интервал маяка на низкой скорости</string>
 <!-- corner pegging should not be translated -->
-<string name="p_corner_pegging">Угловая привязка</string>
+<string name="p_corner_pegging">Corner Pegging</string>
 <string name="p_cp_turn_time">Минимальное время поворота [сек]</string>
-<string name="p_cp_turn_time_summary">Минимальный рейтинг маяка при смене направления</string>
+<string name="p_cp_turn_time_summary">Минимальный интервал маяка при смене направления</string>
 <string name="p_cp_turn_angle">Минимальный угол поворота [°]</string>
 <string name="p_cp_turn_angle_summary">Минимальный угол на высокой скорости</string>
 <string name="p_cp_turn_slope">Уклон поворота</string>
@@ -336,19 +340,20 @@
 <string name="p_themefile_choose">Выбор файла темы</string>
 <string name="themefile_error">Ошибка загрузки файла темы %s!</string>
 
-<string name="kbdnav_title">Keyboard Navigation</string>
+<string name="kbdnav_title">Навигация клавиатурой</string>
 <!-- keyboard navigation info -->
 <string-array name="kbdnav_lines">
-	<item>move map</item>
-	<item>zoom</item>
-	<item>menu</item>
-	<item>select</item>
+	<item>переместить карту</item>
+	<item>увеличить</item>
+	<item>меню</item>
+	<item>выбрать</item>
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
   Aleksey Kabanov https://launchpad.net/~ak099
   Andriy Tymchenko https://launchpad.net/~silpol
-  Dmitrij Kiryanov https://launchpad.net/~kagaminep
+  Christopher Mironov https://launchpad.net/~zje8p67bbg8hv
+  Dmitriy Kiryanov https://launchpad.net/~kagaminep
   Georg Lukas https://launchpad.net/~ge0rg
   Mikhail Mikhaylov https://launchpad.net/~mimiknn
   R1AIT https://launchpad.net/~l-keo-d
@@ -382,13 +387,13 @@
 <string name="bt_error_disabled">Пожалуйста включите Bluetooth!</string>
 <string name="bt_error_no_tnc">Пожалуйста настройте Bluetooth TNC!</string>
 <string name="bt_error_connect">Не могу связаться с %s! Пожалуйста включите устройство и закройте все другие соединения Bluetooth.</string>
-<string name="bt_awaiting">Awaiting client…</string>
-<string name="bt_client_connected">Client %s connected.</string>
-<string name="bt_connecting_to_spp">Connecting to SPP service on %s…</string>
+<string name="bt_awaiting">В ожидании клиента...</string>
+<string name="bt_client_connected">Клиент %s подключен.</string>
+<string name="bt_connecting_to_spp">Подключяюсь службе SPP на %s…</string>
 <!-- connecting to [device name] channel [bluetooth channel id] -->
-<string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
-<string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
+<string name="bt_connecting_to_channel">Подключяюсь к %s на канале %d…</string>
+<string name="bt_connected">Подключено к TNC.</string>
+<string name="bt_reconnecting">Повторное подключение через 3с...</string>
 
 
 <string name="afsk_info_sco_req">Запрос соединения Bluetooth...</string>
@@ -414,11 +419,11 @@
 
 <!-- (USB) Serial TNC settings -->
 <string name="p_serial_baudrate">Скорость в бодах</string>
-<string name="p_serial_baudrate_summary">Скорость передачи последовательного порта</string>
+<string name="p_serial_baudrate_summary">Скорость передачи данных serial порта</string>
 <!-- (USB) Serial Errors -->
 <string name="p_serial_unsupported">Последовательный порт не поддерживается!</string>
 <string name="p_serial_noperm">Нет прав доступа к USB устройству!</string>
 <string name="p_serial_notfound">Не найдено USB устройство!</string>
 
-<string name="no_perm_text">The following permissions are required:</string>
+<string name="no_perm_text">Требуются следующие разрешения:</string>
 </resources>

@@ -1,120 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- APRSdroid strings.xml - this file contains strings which need to be translated -->
 <resources>
-<string name="app_name">APRSdroid</string>
-<string name="app_prefs">Preferències APRSdroid</string>
-<string name="app_map">APRSdroid Mapa</string>
-<string name="app_hub">APRSdroid Hub</string>
-<string name="app_log">APRSdroid Log</string>
-<string name="app_sta">Informació de l\'estació</string>
-<string name="app_messages">Missatges</string>
-<string name="app_messages_clear">Clear Messages</string>
+<string name="app_name">ஏபிஆர்எஸ்-டிராயிடு</string>
+<string name="app_prefs">ஏபிஆர்எஸ்-டிராயிடு விருப்பத்தேர்வுகள்</string>
+<string name="app_map">ஏபிஆர்எஸ்-டிராயிடு நிலப்படம்</string>
+<string name="app_hub">ஏபிஆர்எஸ்-டிராயிடு மையம்</string>
+<string name="app_log">ஏபிஆர்எஸ்-டிராயிடு பதிவுகள்</string>
+<string name="app_sta">நிலையத் தகவல்</string>
+<string name="app_messages">குறுஞ்செய்திகள்</string>
+<string name="app_messages_clear">குறுஞ்செய்திகளை அழிக்க</string>
 <!-- APRSdroid activity -->
-<string name="firstrun">¡Has de configurar APRSdroid amb el teu indicatiu  i la contrasenya!</string>
-<string name="wrongpasscode">¡El codi d\'accés no coincideix amb el teu indicatiu!</string>
-<string name="e_toolong_callsign">Your callsign is too long for Packet Radio!</string>
-<string name="anon_warning">Without a passcode, your reports will not be propagated!</string>
-<string name="mininterval">Minimum update time is 1 minute!</string>
-<string name="singlelog">Send Position</string>
-<string name="startlog">Start Tracking</string>
-<string name="stoplog">Stop Tracking</string>
+<string name="firstrun">உங்கள் கால் சைன் மற்றும் பாஸ்கோடு குறியீடுகளை  பதிவு செய்து ஏபிஆர்எஸ்-டிராயிடை உள்ளமைக்கவும்!</string>
+<string name="wrongpasscode">உங்கள்  பாஸ்கோடு குறியீடு உங்கள் கால் சைனுடன் ஒத்து போகவில்லை!</string>
+<string name="e_toolong_callsign">உங்கள் கால் சைன், பாக்கெட் ரேடியோவிற்கு ஒவ்வாதவாறு மிகவும் நீளமாக உள்ளது!</string>
+<string name="anon_warning">பாஸ்கோடு குறியீடு இல்லாமல் உங்கள் அறிக்கைகள் பிரசுரம் ஆகாது!</string>
+<string name="mininterval">குறைந்தபட்ச புதுப்பிப்பு நேரம் 1 நிமிடம்!</string>
+<string name="singlelog">இருப்பிடத்தை அனுப்பு</string>
+<string name="startlog">கண்காணிப்பைத் தொடங்கு</string>
+<string name="stoplog">கண்காணிப்பதை நிறுத்து</string>
 
-<string name="empty_logview">You have not yet sent or received any packets.\n\n
-	Press the \"Menu\" button to send a single report or to start tracking your position.\n\n
-	You can also change the application preferences from the menu.</string>
+<string name="empty_logview">நீங்கள் இன்னும் எந்த பாக்கெட்டுகளையும் அனுப்பவோ பெறவோ இல்லை.\n\n ஒற்றை அறிக்கையை அனுப்ப அல்லது உங்கள் இருப்பிடத்தைக் கண்காணிக்கத் தொடங்க \"மெனு\" பொத்தானை அழுத்தவும்.\n\n மெனு வாயிலாக உங்கள் பயன்பாட்டு விருப்பங்களை மாற்றவும் செய்யலாம்.</string>
 
 <!-- Maps activity -->
-<string name="sta_lastreport">%s Last Report</string>
-<string name="map_track_call">Tracking %s...</string>
-<string name="map_track_unknown">Position for %s unknown!</string>
-<string name="map_select">Select station</string>
+<string name="sta_lastreport">%s கடைசி அறிக்கை</string>
+<string name="map_track_call">%s கண்காணிக்கப்படுகிறது...</string>
+<string name="map_track_unknown">%s இன்  இருப்பிடம் தெரியவில்லை !</string>
+<string name="map_select">நிலையத்தைத் தேர்ந்தெடுக்கவும்</string>
 
-<string name="map_loading">Loading...</string>
+<string name="map_loading">தொடங்குகிறது...</string>
 
 <!-- StationInfo activity -->
-<string name="sta_ssids">SSID d\'estació</string>
-<string name="sta_history">Station History</string>
-<string name="sta_map">Mapa</string>
-<string name="sta_extmap">External Map</string>
+<string name="sta_ssids">நிலைய SSIDகள்</string>
+<string name="sta_history">நிலைய வரலாறு</string>
+<string name="sta_map">நிலப்படம்</string>
+<string name="sta_extmap">வெளிப்புற நிலப்படம்</string>
 <string name="sta_aprsfi">aprs.fi</string>
 <string name="sta_qrzcom">QRZ.com</string>
 
 <!-- Conversations activity -->
-<string name="msg_send_new">Send message to...</string>
-<string name="msg_message_text">Message text</string>
-<string name="msg_empty_list">There are no stored conversations.</string>
-<string name="msg_stored_offline">The message will be sent as soon as you start tracking.</string>
+<string name="msg_send_new">இவர்களுக்கு குறுஞ்செய்தி அனுப்பு...</string>
+<string name="msg_message_text">குறுஞ்செய்தி உரை</string>
+<string name="msg_empty_list">சேமிக்கப்பட்ட உரையாடல்கள் எதுவும் இல்லை.</string>
+<string name="msg_stored_offline">நீங்கள் கண்காணிக்கத் தொடங்கியவுடன் செய்தி அனுப்பப்படும்.</string>
 <!-- Message activity -->
-<string name="msg_from">Message from %s</string>
-<string name="msg_to">Message to %s</string>
-<string name="msg_abort">Abort transmission</string>
-<string name="msg_restart">Restart transmission</string>
-<string name="msg_type_rejected">rejected</string>
-<string name="msg_type_aborted">aborted</string>
+<string name="msg_from">%s இடமிருந்து செய்தி</string>
+<string name="msg_to">%s அவர்களுக்கு செய்தி</string>
+<string name="msg_abort">ஒலிபரப்புதலை ரத்து செய்</string>
+<string name="msg_restart">ஒலிபரப்புதலை மீண்டும் ஆரம்பி</string>
+<string name="msg_type_rejected">நிராகரிக்கப்பட்டது</string>
+<string name="msg_type_aborted">கைவிடப்பட்டது</string>
 
 <!-- AprsService -->
-<string name="aprsservice">APRSdroid Service</string>
-<string name="service_once">APRS Service single shot: %1$s, %2$s.</string>
-<string name="service_start">APRS Service started: %1$s, %2$s.</string>
-<string name="service_stop">APRS Service stopped.</string>
-<string name="service_no_location">You need to enable either GPS or Network Location for APRSdroid to work properly!</string>
-<string name="service_sm_no_gps">SmartBeaconing™ requires GPS!</string>
+<string name="aprsservice">ஏபிஆர்எஸ்-டிராயிடு சேவை</string>
+<string name="service_once">ஒற்றை முயற்சி ஏபிஆர்எஸ்-டிராயிடு சேவை %1$s, %2$s.</string>
+<string name="service_start">ஏபிஆர்எஸ் சேவை ஆரம்பித்துள்ளது:  %1$s, %2$s.</string>
+<string name="service_stop">ஏபிஆர்எஸ் சேவை நின்றுள்ளது</string>
+<string name="service_no_location">ஏபிஆர்எஸ்-டிராயிடு சரியாக வேலை செய்ய, நீங்கள் ஜிபிஎஸ் அல்லது நெட்வொர்க் இருப்பிட சேவையை இயக்க வேண்டும்!</string>
+<string name="service_sm_no_gps">SmartBeaconing™ இற்கு ஜிபிஎஸ் தேவை!</string>
 <!-- service result codes -->
-<string name="post_error">Error</string>
-<string name="post_incmg">received</string>
+<string name="post_error">பிழை</string>
+<string name="post_incmg">பெறப்பட்டது</string>
 <string name="post_info"/>
-<string name="post_connecting">Connecting to %1$s:%2$d...</string>
-<string name="post_reconnect">Connection lost. Reconnect in %d seconds...</string>
+<string name="post_connecting">%1$s:%2$d உடன் இணைக்கப் படுகிறது</string>
+<string name="post_reconnect">இணைப்பு துண்டிக்கப் பட்டுள்ளது. மறு இணைப்பு இன்னும் %d வினாடிகளில்...</string>
 
 <!-- first run dialog -->
-<string name="fr_title">Welcome to APRSdroid!</string>
-<string name="fr_text">This software may only be used by licensed amateur radio
-	operators!</string>
-<string name="fr_text2">You need to enter your callsign to use this software.
-	To forward your packets, an APRS-IS passcode is required as well.</string>
-<string name="fr_text3">Only needed for APRS over the Internet:</string>
+<string name="fr_title">ஏபிஆர்எஸ்-டிராயிடிற்கு வருக!</string>
+<string name="fr_text">இந்த மென்பொருளை உரிமம் பெற்ற அமெச்சூர் ரேடியோ ஆபரேட்டர்கள் மட்டுமே பயன்படுத்த முடியும்!</string>
+<string name="fr_text2">இந்த மென்பொருளைப் பயன்படுத்த உங்கள் கால் சைன்-ஐ  உள்ளிட வேண்டும். உங்கள் பாக்கெட்டுகளை அனுப்ப, ஏபிஆர்எஸ்-ஐஎஸ் பாஸ்கோடும் தேவை.</string>
+<string name="fr_text3">இணைய வழியிலான ஏபிஆர்எஸ்-இற்கு மட்டுமே இது தேவை:</string>
 
 <!-- about dialog -->
-<string name="ad_title">About APRSdroid v%s</string>
+<string name="ad_title">ஏபிஆர்எஸ்-டிராயிடு v%s -ஐப்  பற்றி</string>
 <string name="ad_copyright">Copyright © 2009-2025 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
 	APRS® is a registered trademark of Bob Bruninga (WB4APR)
 </string>
-<string name="ad_gpl">This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-	\n\n
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	\n\n
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-	\n\n
-	http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-	</string>
-<string name="ad_thanks">Thanks to:</string>
-<string name="ad_thanks_0">My YL ♥♥♥</string>
-<string name="ad_thanks_1">Michael, DO3BOX: idea</string>
-<string name="ad_thanks_2">Dirk, DB5OY: motivation and support</string>
+<string name="ad_gpl">இந்த நிரல் இலவச மென்பொருள்; நீங்கள் இதை மறுபகிர்வு செய்யலாம். அதுமட்டுமல்லாமல் இதை இலவச மென்பொருள் அறக்கட்டளையால் வெளியிடப்பட்ட GNU பொது பொது உரிமத்தின் விதிமுறைகளின் கீழ் மாற்றலாம்; உரிமத்தின் பதிப்பு 2 அல்லது (உங்கள் விருப்பப்படி) எந்த பிந்தைய பதிப்பிலும் மாற்றலாம். \n\n இந்த நிரல் பயனுள்ளதாக இருக்கும் என்ற நம்பிக்கையில்தான்  விநியோகிக்கப்படுகிறது, ஆனால் அதற்கான எந்த உத்தரவாதமும் இல்லை; வணிகத்தன்மை அல்லது குறிப்பிட்ட நோக்கத்திற்கான பொருத்தத்தின் மறைமுக உத்தரவாதம் கூட இல்லாமல்தான் விநியோகிக்கப்படுகிறது. மேலும் விவரங்களுக்கு GNU பொது பொது உரிமத்தைப் பார்க்கவும். \n\n இந்த நிரலுடன் GNU பொது பொது உரிமத்தின் நகலையும் நீங்கள் பெற்றிருக்கலாம்; இல்லையென்றால், Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA என்ற முகவரிக்கு எழுதுங்கள். \n\n http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</string>
+<string name="ad_thanks">நன்றி:</string>
+<string name="ad_thanks_0">என்னுடைய YL ♥♥♥</string>
+<string name="ad_thanks_1">மைக்கேல், DO3BOX: யோசனைகளுக்கு</string>
+<string name="ad_thanks_2">டிர்க், DB5OY: ஊக்கம் மற்றும் ஆதரவு</string>
 <string name="ad_thanks_3">Bastian, DB1BM: AFSK implementation</string>
 <string name="ad_thanks_4">Matti, OH2MQK and John, AB0OO: Java APRS</string>
 <string name="ad_thanks_5">Sivan, 4X6IZ: AFSK demodulator, https://github.com/sivantoledo/javAX25</string>
 <string name="ad_thanks_6">SmartBeaconing™ by HamHUD Nichetronix, LLC, http://hamhud.net</string>
 <string name="ad_trans">\n\nTranslation:</string>
-<string name="ad_homepage">Home Page</string>
+<string name="ad_homepage">முகப்பு பக்கம்</string>
 
 <!-- map view -->
-<string name="map_overlays">Overlays</string>
-<string name="map_google">Google: Map</string>
-<string name="map_satellite">Google: Satellite</string>
-<string name="map_osm">OpenStreetMap.org</string>
+<string name="map_overlays">மேலடுக்குகள்</string>
+<string name="map_google">கூகிள்: நிலப்படம்</string>
+<string name="map_satellite">கூகிள்: செயற்கைக்கோள்</string>
+<string name="map_osm">ஓப்பன் ஸ்ட்ரீட் மாப் டாட் ஆர்க்</string>
 <!-- intended use is in map style menu: "file name of offline map (Offline)" -->
-<string name="map_offline"> %s (Offline)</string>
+<string name="map_offline">%s (ஆஃப்லைன்)</string>
 <string name="map_objects">APRS Objects</string>
 
 <!-- map view -->
@@ -129,10 +110,10 @@
 <!-- options menu -->
 <string name="about">About</string>
 <string name="show_hub">Show Hub</string>
-<string name="show_map">Show Map</string>
-<string name="show_log">Show Log</string>
-<string name="export_log">Export Log</string>
-<string name="export_empty">Nothing to export</string>
+<string name="show_map">நிலப்படத்தை காட்டு</string>
+<string name="show_log">பதிவைக் காட்டு</string>
+<string name="export_log">பதிவு ஏற்றுமதி</string>
+<string name="export_empty">ஏற்றுமதி செய்ய ஒன்றுமில்லை</string>
 <string name="clear_log">Clear Log</string>
 <string name="quit">Quit</string>
 <string name="preferences">Preferences</string>
@@ -369,8 +350,7 @@
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
-  Georg Lukas https://launchpad.net/~ge0rg
-  Paco-EB5TC https://launchpad.net/~paco-eb5tc</string>
+  Clement Ronald https://launchpad.net/~bcronald</string>
 
 <!-- Bluetooth TNC settings -->
 <string name="p_bt_client">Client Mode</string>

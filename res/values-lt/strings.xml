@@ -2,16 +2,16 @@
 <!-- APRSdroid strings.xml - this file contains strings which need to be translated -->
 <resources>
 <string name="app_name">APRSdroid</string>
-<string name="app_prefs">Preferències APRSdroid</string>
-<string name="app_map">APRSdroid Mapa</string>
+<string name="app_prefs">APRSdroid nuostatos</string>
+<string name="app_map">APRSdroid žemėlapis</string>
 <string name="app_hub">APRSdroid Hub</string>
-<string name="app_log">APRSdroid Log</string>
-<string name="app_sta">Informació de l\'estació</string>
-<string name="app_messages">Missatges</string>
-<string name="app_messages_clear">Clear Messages</string>
+<string name="app_log">APRSdroid žurnalas</string>
+<string name="app_sta">Stoties informacija</string>
+<string name="app_messages">Žinutės</string>
+<string name="app_messages_clear">Išvalyti pranešimus</string>
 <!-- APRSdroid activity -->
-<string name="firstrun">¡Has de configurar APRSdroid amb el teu indicatiu  i la contrasenya!</string>
-<string name="wrongpasscode">¡El codi d\'accés no coincideix amb el teu indicatiu!</string>
+<string name="firstrun">Jums reikia sukonfigūruoti APRSdroid su savo šaukiniu ir slaptažodžiu!</string>
+<string name="wrongpasscode">Jūsų slaptažodis neatitinka jūsų šaukinio!</string>
 <string name="e_toolong_callsign">Your callsign is too long for Packet Radio!</string>
 <string name="anon_warning">Without a passcode, your reports will not be propagated!</string>
 <string name="mininterval">Minimum update time is 1 minute!</string>
@@ -32,9 +32,9 @@
 <string name="map_loading">Loading...</string>
 
 <!-- StationInfo activity -->
-<string name="sta_ssids">SSID d\'estació</string>
+<string name="sta_ssids">Station SSIDs</string>
 <string name="sta_history">Station History</string>
-<string name="sta_map">Mapa</string>
+<string name="sta_map">Map</string>
 <string name="sta_extmap">External Map</string>
 <string name="sta_aprsfi">aprs.fi</string>
 <string name="sta_qrzcom">QRZ.com</string>
@@ -369,8 +369,7 @@
 </string-array>
 
 <string name="translator_credits">Launchpad Contributions:
-  Georg Lukas https://launchpad.net/~ge0rg
-  Paco-EB5TC https://launchpad.net/~paco-eb5tc</string>
+  Ieva Vai https://launchpad.net/~dijndmiu</string>
 
 <!-- Bluetooth TNC settings -->
 <string name="p_bt_client">Client Mode</string>
