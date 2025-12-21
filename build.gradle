@@ -3,44 +3,39 @@ buildscript {
 	repositories {
 		maven { url 'https://jitpack.io' }
 		mavenCentral()
+		mavenLocal()
 		google()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:3.5.1'
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
-
-		// grgit for version tags
-		classpath 'org.ajoberstar:grgit:1.1.0'
-
-		// https://github.com/Triple-T/gradle-play-publisher#usage
-		classpath 'com.github.triplet.gradle:play-publisher:2.4.1'
-
-		// scala build
-		classpath 'com.github.AllBus:gradle-android-scala-plugin:3.5.1'
 	}
 }
 
 plugins {
 	// obtain revision from git
-	id 'org.ajoberstar.grgit' version '1.6.0'
+	id 'org.ajoberstar.grgit' version '5.3.2'
+	// https://github.com/Triple-T/gradle-play-publisher#usage
+	id("com.github.triplet.play") version "3.13.0"
+	alias(libs.plugins.androidApplication)
+	alias(libs.plugins.scalaAndroid)
 }
 
 allprojects {
 	repositories {
-		google()
+		maven { url 'https://jitpack.io' }
 		mavenCentral()
+		mavenLocal()
+		google()
 	}
 }
 
 /////////////// APRSdroid specific build rules ///////////////
-apply plugin: 'com.android.application'
-apply plugin: 'jp.leafytree.android-scala'
-apply plugin: 'com.github.triplet.play'
+scala.scalaVersion = "2.11.12"
 
 ext {
-	build_date = "${new Date().format('yyyy-MM-dd')}"
-	build_revision = "${grgit.describe()}"
+	build_date = new Date().format('yyyy-MM-dd')
+	build_revision = grgit.describe(tags: true)
 	build_version = "APRSdroid ${build_revision} ${build_date}"
 }
 
@@ -68,11 +63,11 @@ def mapsApiKey() {
 
 
 android {
-	compileSdkVersion 33
-	buildToolsVersion "33.0.2"
+	namespace 'org.aprsdroid.app'
 	defaultConfig {
-		minSdkVersion 14
-		targetSdkVersion 33
+		compileSdk = 33
+		minSdk = 14
+		targetSdk = 33
 		versionName "$build_revision"
 		versionCode versionCodeDate()
 		resValue "string", "build_revision", "$build_revision"
@@ -85,8 +80,8 @@ android {
 	}
 	useLibrary 'org.apache.http.legacy'
 	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_8
-		targetCompatibility JavaVersion.VERSION_1_8
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
 	}
 
 	buildTypes {
@@ -149,12 +144,11 @@ play {
 }
 
 dependencies {
-	implementation "org.scala-lang:scala-library:2.11.12"
-	//compile 'com.google.android.gms:play-services-maps:6.5.87'
+	implementation(libs.scala.library)
 	implementation fileTree(include: ['*.jar'], dir: 'libs')
 	implementation 'com.google.android.gms:play-services-maps:17.0.0'
 	implementation 'com.google.maps.android:android-maps-utils:0.5'
-	implementation 'androidx.core:core:1.6.0'
+	implementation 'androidx.core:core:1.12.0'
 
 
 	implementation 'com.squareup.okio:okio:2.1.0'
@@ -162,3 +156,4 @@ dependencies {
 	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 	testImplementation 'junit:junit:4.12'
 }
+
