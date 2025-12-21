@@ -40,7 +40,7 @@ class MainListActivity(actname : String, menuid : Int) extends LoadingListActivi
 		setupButtons(AprsService.running)
 		makeLaunchActivity(actname)
 
-		ContextCompat.registerReceiver(this, miclReceiver, new IntentFilter(AprsService.MICLEVEL), Context.RECEIVER_EXPORTED)
+		ContextCompat.registerReceiver(this, miclReceiver, new IntentFilter(AprsService.MICLEVEL), Context.RECEIVER_NOT_EXPORTED)
 		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.SERVICE_STOPPED), Context.RECEIVER_EXPORTED)
 		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.LINK_OFF), Context.RECEIVER_EXPORTED)
 		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.LINK_ON), Context.RECEIVER_EXPORTED)

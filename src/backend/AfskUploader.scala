@@ -110,6 +110,7 @@ class AfskUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBack
 
 	def notifyMicLevel(level : Int) {
 		val i = new Intent(AprsService.MICLEVEL)
+		i.setPackage(service.getPackageName())
 		i.putExtra("level", level)
 		service.sendBroadcast(i)
 	}
