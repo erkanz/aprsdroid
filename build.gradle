@@ -65,9 +65,9 @@ def mapsApiKey() {
 android {
 	namespace 'org.aprsdroid.app'
 	defaultConfig {
-		compileSdk = 33
+		compileSdk = 34
 		minSdk = 14
-		targetSdk = 33
+		targetSdk = 34
 		versionName "$build_revision"
 		versionCode versionCodeDate()
 		resValue "string", "build_revision", "$build_revision"
