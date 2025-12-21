@@ -2,10 +2,12 @@ package org.aprsdroid.app
 
 import _root_.android.app.{Notification, NotificationChannel, NotificationManager, PendingIntent, Service}
 import _root_.android.content.{Context, Intent}
+import _root_.android.content.pm.ServiceInfo
 import _root_.android.net.Uri
 import _root_.android.os.Build
 import _root_.android.os.Vibrator
 import _root_.android.graphics.Color
+import _root_.androidx.core.app.ServiceCompat
 
 
 object ServiceNotifier {
@@ -116,7 +118,7 @@ class ServiceNotifier {
 	}
 
 	def start(ctx : Service, status : String) = {
-		ctx.startForeground(SERVICE_NOTIFICATION, newNotification(ctx, status))
+		ServiceCompat.startForeground(ctx, SERVICE_NOTIFICATION, newNotification(ctx, status), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 	}
 
 	def stop(ctx : Service) = {
