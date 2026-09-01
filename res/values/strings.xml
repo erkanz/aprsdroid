@@ -414,6 +414,8 @@
 <string name="ble_scan_choose">Choose a BLE KISS TNC.</string>
 <string name="ble_scan_none">No BLE KISS TNC found. Make sure the TNC is powered on and advertising.</string>
 <string name="ble_scan_permission">Bluetooth scan permission is required.</string>
+<string name="ble_location_required">Location must be turned on for BLE scanning on this Android version.</string>
+<string name="ble_standard_kiss">%1$s  [BLE KISS]</string>
 <string name="ble_scan_failed">BLE scan failed (code %d).</string>
 <string name="ble_scan_failed_generic">Could not start BLE scan.</string>
 <string name="ble_unnamed_device">Unnamed BLE KISS TNC</string>
