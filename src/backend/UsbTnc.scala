@@ -97,8 +97,8 @@ class UsbTnc(service : AprsService, prefs : PrefsWrapper) extends AprsBackend(pr
 		Log.d(TAG, "UsbTnc.requestPermissions");
 		val dl = usbManager.getDeviceList();
 		var requested = false
-		import scala.collection.JavaConversions._
-		for ((name, dev) <- dl) {
+		import scala.jdk.CollectionConverters._
+		for ((name, dev) <- dl.asScala) {
 			val deviceVID = dev.getVendorId()
 			val devicePID = dev.getProductId()
 			if (UsbSerialDevice.isSupported(dev)) {
