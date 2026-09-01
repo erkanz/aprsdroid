@@ -415,11 +415,8 @@
 <string name="ble_scan_none">No BLE KISS TNC found. Make sure the TNC is powered on and advertising.</string>
 <string name="ble_scan_permission">Bluetooth scan permission is required.</string>
 <string name="ble_location_required">Location must be turned on for BLE scanning on this Android version.</string>
-<string name="ble_standard_kiss">%1$s  [BLE KISS]</string>
-<string name="ble_unverified_device">%1$s  [unverified]</string>
 <string name="ble_scan_failed">BLE scan failed (code %d).</string>
 <string name="ble_scan_failed_generic">Could not start BLE scan.</string>
-<string name="ble_unnamed_device">Unnamed BLE device</string>
 <string name="ble_selected">Selected %s</string>
 <string name="ble_error_unsupported">Bluetooth LE KISS requires Android 5.0 or newer.</string>
 <string name="ble_error_no_tnc">Please scan for and select a BLE KISS TNC.</string>
@@ -460,4 +457,6 @@
 <string name="p_serial_notfound">No USB device found!</string>
 
 <string name="no_perm_text">The following permissions are required:</string>
+<string name="ble_unnamed_device">Unnamed BLE KISS TNC</string>
+<string name="ble_standard_kiss">%1$s  [BLE KISS]</string>
 </resources>
