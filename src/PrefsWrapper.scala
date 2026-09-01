@@ -75,7 +75,11 @@ class PrefsWrapper(val context : Context) {
 		val link = AprsBackend.defaultProtoInfo(this).link
 		link match {
 		case "aprsis" => "%s, %s".format(proto, getListItemName(link, AprsBackend.DEFAULT_CONNTYPE, R.array.p_aprsis_ev, R.array.p_aprsis_e))
-		case "link" => "%s, %s".format(proto, getListItemName(link, AprsBackend.DEFAULT_CONNTYPE, R.array.p_link_ev, R.array.p_link_e))
+		case "link" =>
+			if (getProto() == "kiss")
+				"%s, %s".format(proto, getListItemName(link, AprsBackend.DEFAULT_LINK, R.array.p_kiss_link_ev, R.array.p_kiss_link_e))
+			else
+				"%s, %s".format(proto, getListItemName(link, AprsBackend.DEFAULT_LINK, R.array.p_link_ev, R.array.p_link_e))
 		case _ => proto
 		}
 	}
