@@ -346,7 +346,7 @@ public class BleDeviceScanActivity extends Activity {
 
                 String displayName = advertisesKiss
                         ? activity.getString(R.string.ble_standard_kiss, name)
-                        : name;
+                        : activity.getString(R.string.ble_unverified_device, name);
 
                 String detail = hasRealName ? address : "";
                 if (!detail.isEmpty())
