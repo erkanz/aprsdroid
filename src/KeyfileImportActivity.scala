@@ -14,7 +14,7 @@ import _root_.java.io.FileOutputStream
 import _root_.java.security.KeyStore
 import _root_.java.security.cert.X509Certificate
 
-import scala.collection.JavaConversions._ // for enumeration of keystore aliases
+import scala.jdk.CollectionConverters._ // for enumeration of keystore aliases
 
 class KeyfileImportActivity extends Activity {
 	val TAG = "APRSdroid.KeyImport"
@@ -60,7 +60,7 @@ class KeyfileImportActivity extends Activity {
 			val ks = KeyStore.getInstance("PKCS12")
 			ks.load(getContentResolver().openInputStream(getIntent.getData()), password.toCharArray)
 			var callsign : String = null
-			for (alias <- ks.aliases()) {
+			for (alias <- ks.aliases().asScala) {
 				if (ks.isKeyEntry(alias)) {
 					val c = ks.getCertificate(alias).asInstanceOf[X509Certificate]
 					// work around missing X500Principal.getName(String, Map<String, String) on SDK<9:
