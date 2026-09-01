@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.provider.Settings;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -102,7 +104,32 @@ public class BleDeviceScanActivity extends Activity {
             }
         }
 
+        if (!isLocationEnabledForLegacyBle()) {
+            statusView.setText(R.string.ble_location_required);
+            return;
+        }
+
         startScan21();
+    }
+
+    private boolean isLocationEnabledForLegacyBle() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            return true;
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                LocationManager lm =
+                        (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                return lm != null && lm.isLocationEnabled();
+            }
+
+            return Settings.Secure.getInt(
+                    getContentResolver(),
+                    Settings.Secure.LOCATION_MODE,
+                    Settings.Secure.LOCATION_MODE_OFF) != Settings.Secure.LOCATION_MODE_OFF;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     @Override
@@ -121,6 +148,11 @@ public class BleDeviceScanActivity extends Activity {
                 statusView.setText(R.string.ble_scan_permission);
                 return;
             }
+        }
+
+        if (!isLocationEnabledForLegacyBle()) {
+            statusView.setText(R.string.ble_location_required);
+            return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -222,10 +254,6 @@ public class BleDeviceScanActivity extends Activity {
                     return;
                 }
 
-                android.bluetooth.le.ScanFilter filter =
-                        new android.bluetooth.le.ScanFilter.Builder()
-                                .setServiceUuid(new android.os.ParcelUuid(KISS_SERVICE_UUID))
-                                .build();
                 android.bluetooth.le.ScanSettings settings =
                         new android.bluetooth.le.ScanSettings.Builder()
                                 .setScanMode(android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -233,7 +261,11 @@ public class BleDeviceScanActivity extends Activity {
 
                 scanning = true;
                 statusView.setText(R.string.ble_scanning);
-                scanner.startScan(java.util.Collections.singletonList(filter), settings, callback);
+                // Do not filter at the scanner level. Some otherwise compatible
+                // BLE-KISS implementations expose the standard GATT service but
+                // omit the service UUID from advertisements. We validate the
+                // service after connecting instead.
+                scanner.startScan(null, settings, callback);
 
                 handler.postDelayed(() -> {
                     stop();
@@ -266,7 +298,22 @@ public class BleDeviceScanActivity extends Activity {
                 if (name == null || name.trim().isEmpty())
                     name = activity.getString(R.string.ble_unnamed_device);
 
-                labels.add(name + "\n" + address);
+                boolean advertisesKiss = false;
+                if (result.getScanRecord() != null &&
+                        result.getScanRecord().getServiceUuids() != null) {
+                    for (android.os.ParcelUuid uuid : result.getScanRecord().getServiceUuids()) {
+                        if (KISS_SERVICE_UUID.equals(uuid.getUuid())) {
+                            advertisesKiss = true;
+                            break;
+                        }
+                    }
+                }
+
+                String displayName = advertisesKiss
+                        ? activity.getString(R.string.ble_standard_kiss, name)
+                        : name;
+
+                labels.add(displayName + "\n" + address);
                 addresses.add(address);
                 listAdapter.notifyDataSetChanged();
                 statusView.setText(R.string.ble_scan_choose);
