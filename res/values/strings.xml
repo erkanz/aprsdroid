@@ -206,6 +206,7 @@
 <string name="p_aprsis_udp">UDP (send only)</string>
 <!-- array of TNC link types -->
 <string name="p_link_bt">Bluetooth SPP</string>
+<string name="p_link_ble">Bluetooth LE KISS</string>
 <string name="p_link_tcpip">TCP/IP</string>
 <string name="p_link_usb">USB Serial</string>
 <!-- array of location sources -->
@@ -402,6 +403,28 @@
 <string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
 <string name="bt_connected">Connected to TNC.</string>
 <string name="bt_reconnecting">Reconnecting in 3s…</string>
+
+<!-- Bluetooth LE KISS settings -->
+<string name="p_ble_scan">Scan for BLE KISS TNC</string>
+<string name="p_ble_scan_summary">Find devices advertising the standard BLE-KISS service</string>
+<string name="p_ble_tnc_device">BLE TNC address</string>
+<string name="p_ble_tnc_device_summary">Selected BLE KISS TNC; can also be entered manually</string>
+<string name="p_ble_tnc_device_entry">Enter BLE device address</string>
+<string name="ble_scanning">Scanning for BLE KISS TNCs…</string>
+<string name="ble_scan_choose">Choose a BLE KISS TNC.</string>
+<string name="ble_scan_none">No BLE KISS TNC found. Make sure the TNC is powered on and advertising.</string>
+<string name="ble_scan_permission">Bluetooth scan permission is required.</string>
+<string name="ble_scan_failed">BLE scan failed (code %d).</string>
+<string name="ble_scan_failed_generic">Could not start BLE scan.</string>
+<string name="ble_unnamed_device">Unnamed BLE KISS TNC</string>
+<string name="ble_selected">Selected %s</string>
+<string name="ble_error_unsupported">Bluetooth LE KISS requires Android 5.0 or newer.</string>
+<string name="ble_error_no_tnc">Please scan for and select a BLE KISS TNC.</string>
+<string name="ble_error_connect">Could not connect to BLE KISS TNC %s.</string>
+<string name="ble_error_service">Connected device does not expose the BLE-KISS service.</string>
+<string name="ble_error_characteristics">BLE-KISS RX/TX characteristics are missing.</string>
+<string name="ble_error_subscribe">Could not subscribe to BLE-KISS RX notifications.</string>
+<string name="ble_reconnecting">BLE link lost. Reconnecting in 3s…</string>
 
 
 <string name="afsk_info_sco_req">Requesting bluetooth SCO link...</string>
