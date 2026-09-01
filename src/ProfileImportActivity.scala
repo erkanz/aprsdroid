@@ -13,7 +13,6 @@ import java.util.Scanner
 
 import org.json._
 
-import scala.collection.JavaConversions._ // for enumeration of config items
 
 class ProfileImportActivity extends Activity {
 	val TAG = "APRSdroid.ProfileImport"
