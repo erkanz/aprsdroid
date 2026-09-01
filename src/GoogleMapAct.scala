@@ -15,7 +15,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 // to make scala-style iterating over arraylist possible
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 class GoogleMapAct extends Activity with MapLoaderBase
                 with OnMarkerClickListener
@@ -158,7 +158,7 @@ class GoogleMapAct extends Activity with MapLoaderBase
         }
 
         def onStationUpdate(stations : util.ArrayList[Station]): Unit = {
-                for (sta <- stations) {
+                for (sta <- stations.asScala) {
                         //Log.d(TAG, "onStaUpdate: " + sta.call)
                         if (map == null)
                                 return
