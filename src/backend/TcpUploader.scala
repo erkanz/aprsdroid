@@ -11,7 +11,7 @@ import _root_.java.security.cert.X509Certificate
 import _root_.javax.net.ssl.{KeyManagerFactory, SSLContext, SSLSocket, X509TrustManager}
 import _root_.net.ab0oo.aprs.parser.APRSPacket
 
-import scala.collection.JavaConversions._ // for enumeration of keystore aliases
+import scala.jdk.CollectionConverters._ // for enumeration of keystore aliases
 
 class TcpUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBackend(prefs) {
 	val TAG = "APRSdroid.TcpUploader"
@@ -67,7 +67,7 @@ class TcpUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBacke
 
 			try {
 				ks.load(new java.io.FileInputStream(keyStoreFile), KEYSTORE_PASS)
-				for (alias <- ks.aliases()) {
+				for (alias <- ks.aliases().asScala) {
 					if (ks.isKeyEntry(alias)) {
 						val c = ks.getCertificate(alias).asInstanceOf[X509Certificate]
 						// check if the cert is valid, throw up otherwise
