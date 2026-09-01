@@ -280,6 +280,30 @@ public class BleDeviceScanActivity extends Activity {
             }
         }
 
+        private String manufacturerSummary(android.bluetooth.le.ScanRecord record) {
+            if (record == null || record.getManufacturerSpecificData() == null ||
+                    record.getManufacturerSpecificData().size() == 0)
+                return null;
+
+            android.util.SparseArray<byte[]> data = record.getManufacturerSpecificData();
+            int companyId = data.keyAt(0);
+            return String.format(java.util.Locale.US, "MFR 0x%04X", companyId);
+        }
+
+        private String serviceSummary(android.bluetooth.le.ScanRecord record) {
+            if (record == null || record.getServiceUuids() == null ||
+                    record.getServiceUuids().isEmpty())
+                return null;
+
+            java.util.UUID uuid = record.getServiceUuids().get(0).getUuid();
+            String s = uuid.toString();
+            if (s.startsWith("0000") &&
+                    s.endsWith("-0000-1000-8000-00805f9b34fb"))
+                return "UUID 0x" + s.substring(4, 8).toUpperCase(java.util.Locale.US);
+
+            return "UUID " + s.substring(0, 8);
+        }
+
         private void addResult(android.bluetooth.le.ScanResult result) {
             if (result == null || result.getDevice() == null)
                 return;
@@ -290,18 +314,29 @@ public class BleDeviceScanActivity extends Activity {
                 if (address == null || !seen.add(address))
                     return;
 
+                android.bluetooth.le.ScanRecord record = result.getScanRecord();
+
                 String name = null;
-                if (result.getScanRecord() != null)
-                    name = result.getScanRecord().getDeviceName();
+                if (record != null)
+                    name = record.getDeviceName();
                 if (name == null)
                     name = device.getName();
-                if (name == null || name.trim().isEmpty())
-                    name = activity.getString(R.string.ble_unnamed_device);
+
+                boolean hasRealName = name != null && !name.trim().isEmpty();
+                if (!hasRealName) {
+                    String hint = manufacturerSummary(record);
+                    if (hint == null)
+                        hint = serviceSummary(record);
+                    if (hint == null)
+                        hint = activity.getString(R.string.ble_unnamed_device);
+
+                    name = hint + "  " + address;
+                }
 
                 boolean advertisesKiss = false;
-                if (result.getScanRecord() != null &&
-                        result.getScanRecord().getServiceUuids() != null) {
-                    for (android.os.ParcelUuid uuid : result.getScanRecord().getServiceUuids()) {
+                if (record != null &&
+                        record.getServiceUuids() != null) {
+                    for (android.os.ParcelUuid uuid : record.getServiceUuids()) {
                         if (KISS_SERVICE_UUID.equals(uuid.getUuid())) {
                             advertisesKiss = true;
                             break;
@@ -313,7 +348,12 @@ public class BleDeviceScanActivity extends Activity {
                         ? activity.getString(R.string.ble_standard_kiss, name)
                         : name;
 
-                labels.add(displayName + "\n" + address);
+                String detail = hasRealName ? address : "";
+                if (!detail.isEmpty())
+                    detail += "   ";
+                detail += "RSSI " + result.getRssi() + " dBm";
+
+                labels.add(displayName + "\n" + detail);
                 addresses.add(address);
                 listAdapter.notifyDataSetChanged();
                 statusView.setText(R.string.ble_scan_choose);
