@@ -39,6 +39,14 @@ object AprsBackend {
 		Manifest.permission.BLUETOOTH_ADMIN
 	}
 
+	val BLE_PERMISSIONS : Set[String] = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+		Set(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+	} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		Set(Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION)
+	} else {
+		Set(Manifest.permission.BLUETOOTH_ADMIN)
+	}
+
 	// map from old "backend" to new proto-link-aprsis (defaults are bluetooth and tcp)
 	val backend_upgrade = Map(
 		"tcp" -> "aprsis-tcpip-tcp",
@@ -81,6 +89,12 @@ object AprsBackend {
 			(s, p) => new BluetoothTnc(s, p),
 			R.xml.backend_bluetooth,
 			Set(BLUETOOTH_PERMISSION),
+			CAN_DUPLEX,
+			PASSCODE_NONE),
+		"ble" -> new BackendInfo(
+			(s, p) => new BluetoothLETnc(s, p),
+			R.xml.backend_ble,
+			BLE_PERMISSIONS,
 			CAN_DUPLEX,
 			PASSCODE_NONE),
 		"tcpip" -> new BackendInfo(
