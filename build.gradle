@@ -31,7 +31,7 @@ allprojects {
 }
 
 /////////////// APRSdroid specific build rules ///////////////
-scala.scalaVersion = "2.11.12"
+scala.scalaVersion = "2.13.12"
 
 ext {
 	build_date = new Date().format('yyyy-MM-dd')
