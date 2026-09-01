@@ -4,6 +4,7 @@
 	android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
     <uses-feature android:name="android.hardware.location" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
@@ -15,6 +16,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
@@ -83,6 +85,9 @@
 		/>
 	<activity android:name=".BackendPrefs" android:label="@string/p__connection"
 		android:parentActivityName=".PrefsAct"
+		/>
+	<activity android:name=".BleDeviceScanActivity" android:label="@string/p_ble_scan"
+		android:parentActivityName=".BackendPrefs"
 		/>
 	<activity android:name=".PrefSymbolAct" android:label="@string/p_symbol"
 		android:parentActivityName=".PrefsAct"
