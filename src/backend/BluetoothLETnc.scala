@@ -1,11 +1,12 @@
 package org.aprsdroid.app
 
 import _root_.android.bluetooth._
-import _root_.android.os.Build
+import _root_.android.os.{Build, Handler, Looper}
 import _root_.android.util.Log
 import _root_.java.io.{ByteArrayOutputStream, IOException, InputStream, OutputStream}
 import _root_.java.util.UUID
-import _root_.java.util.concurrent.LinkedBlockingQueue
+import _root_.java.util.concurrent.{CountDownLatch, LinkedBlockingQueue, TimeUnit}
+import _root_.java.util.concurrent.atomic.AtomicReference
 
 import _root_.net.ab0oo.aprs.parser._
 
@@ -81,13 +82,19 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			extends Thread("APRSdroid BLE KISS connection") {
 
 		val READY_TIMEOUT_MS = 15000L
+		val CONNECT_CALL_TIMEOUT_MS = 5000L
+		val INITIAL_GATT_ATTEMPTS = 3
+		val GATT_RETRY_DELAY_MS = 750L
+		val GATT_ERROR_133 = 133
 		val stateLock = new Object()
+		val mainHandler = new Handler(Looper.getMainLooper())
 
 		@volatile var running = true
 		@volatile var transportReady = false
 		@volatile var connectionActive = false
 		@volatile var connectionError : String = null
 		@volatile var generation = 0
+		@volatile var lastGattStatus = BluetoothGatt.GATT_SUCCESS
 
 		@volatile var gatt : BluetoothGatt = null
 		@volatile var rxCharacteristic : BluetoothGattCharacteristic = null
@@ -204,6 +211,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				if (gen != generation)
 					return
 
+				lastGattStatus = status
+				Log.d(TAG, "onConnectionStateChange status=" + status + " newState=" + newState)
 				if (status != BluetoothGatt.GATT_SUCCESS) {
 					failConnection("GATT status " + status)
 					return
@@ -357,12 +366,59 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			txCharacteristic = null
 		}
 
-		def initConnection() {
+		def connectGattOnMainThread(callback : BluetoothGattCallback) : BluetoothGatt = {
+			val result = new AtomicReference[BluetoothGatt]()
+			val failure = new AtomicReference[Throwable]()
+			val latch = new CountDownLatch(1)
+
+			mainHandler.post(new Runnable {
+				override def run() {
+					try {
+						val context = service.getApplicationContext()
+						val newGatt =
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+								device.connectGatt(
+									context,
+									false,
+									callback,
+									BluetoothDevice.TRANSPORT_LE,
+									BluetoothDevice.PHY_LE_1M_MASK,
+									mainHandler)
+							else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+								device.connectGatt(
+									context,
+									false,
+									callback,
+									BluetoothDevice.TRANSPORT_LE)
+							else
+								device.connectGatt(context, false, callback)
+
+						result.set(newGatt)
+					} catch {
+						case t : Throwable => failure.set(t)
+					} finally {
+						latch.countDown()
+					}
+				}
+			})
+
+			if (!latch.await(CONNECT_CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS))
+				throw new IOException("connectGatt call timed out")
+
+			val thrown = failure.get()
+			if (thrown != null)
+				throw new IOException("connectGatt failed", thrown)
+
+			result.get()
+		}
+
+		def initConnectionOnce(attempt : Int) {
 			closeGatt()
 
 			connectionError = null
 			transportReady = false
 			connectionActive = false
+			lastGattStatus = BluetoothGatt.GATT_SUCCESS
 			input = new BLEInputStream()
 			output = new BLEOutputStream()
 			proto = null
@@ -371,17 +427,14 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			val gen = generation
 			val callback = makeCallback(gen)
 
-			Log.d(TAG, "Connecting BLE KISS to " + tncmac)
+			Log.d(TAG,
+				"Connecting BLE KISS to " + tncmac +
+				" attempt=" + attempt + "/" + INITIAL_GATT_ATTEMPTS +
+				" bondState=" + device.getBondState() +
+				" deviceType=" + device.getType() +
+				" sdk=" + Build.VERSION.SDK_INT)
 
-			gatt =
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-					device.connectGatt(
-						service,
-						false,
-						callback,
-						BluetoothDevice.TRANSPORT_LE)
-				else
-					device.connectGatt(service, false, callback)
+			gatt = connectGattOnMainThread(callback)
 
 			if (gatt == null)
 				throw new IOException("connectGatt returned null")
@@ -389,6 +442,40 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			waitForTransport()
 			proto = AprsBackend.instanciateProto(service, input, output)
 			Log.d(TAG, "BLE KISS transport ready")
+		}
+
+		def initConnection() {
+			var attempt = 1
+			var lastError : Exception = null
+
+			while (running && attempt <= INITIAL_GATT_ATTEMPTS) {
+				try {
+					initConnectionOnce(attempt)
+					return
+				} catch {
+					case e : Exception =>
+						lastError = e
+
+						if (lastGattStatus == GATT_ERROR_133 &&
+						    attempt < INITIAL_GATT_ATTEMPTS &&
+						    running) {
+							Log.w(TAG,
+								"GATT 133 on attempt " + attempt +
+								"; closing GATT and retrying")
+							closeGatt()
+							try Thread.sleep(GATT_RETRY_DELAY_MS * attempt) catch {
+								case _ : InterruptedException =>
+							}
+							attempt += 1
+						} else {
+							throw e
+						}
+				}
+			}
+
+			if (lastError != null)
+				throw lastError
+			throw new IOException("BLE connection stopped")
 		}
 
 		override def run() {
