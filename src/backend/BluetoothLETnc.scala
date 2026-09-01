@@ -587,7 +587,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				Log.d(TAG, "BLE TX " + chunk.length + " bytes")
 			}
 
-			def onWriteComplete(success : Boolean) = synchronized {
+			def onWriteComplete(success : Boolean) : Unit = synchronized {
 				writeInFlight = false
 
 				if (!success) {
