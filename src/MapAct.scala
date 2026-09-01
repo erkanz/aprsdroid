@@ -379,10 +379,10 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		Log.d(TAG, "from " + botleft + " to " + topright)
 		// fetch stations in the tap
 		val list = stations.asScala.filter(_.inArea(botleft, topright)).map(_.call)
-		Log.d(TAG, "found " + list.size() + " stations")
-		val result = if (list.size() == 0)
+		Log.d(TAG, "found " + list.size + " stations")
+		val result = if (list.size == 0)
 			false // nothing found, do not revert to superclass
-		else if (list.size() == 1) {
+		else if (list.size == 1) {
 			// found one entry
 			val call = list(0)
 			Log.d(TAG, "user clicked on " + call)
