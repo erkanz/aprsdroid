@@ -6,6 +6,10 @@ on:
       - feature/ble-kiss
   workflow_dispatch:
 
+concurrency:
+  group: ble-kiss-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   assemble-debug:
     runs-on: ubuntu-latest
