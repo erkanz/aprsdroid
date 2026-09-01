@@ -26,7 +26,7 @@ import org.mapsforge.v3.android.maps.mapgenerator.{MapGeneratorFactory, MapGener
 import org.mapsforge.v3.map.reader.header.FileOpenResult
 
 // to make scala-style iterating over arraylist possible
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 class MapAct extends MapActivity with MapMenuHelper {
 	override val TAG = "APRSdroid.Map"
@@ -290,7 +290,7 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		val path = new Path()
 		val point = new Point()
 
-		if (s.movelog.size() < 2) {
+		if (s.movelog.size < 2) {
 			return
 		}
 		var first = true
@@ -334,7 +334,7 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		val p = new Point()
 		val (width, height) = (c.getWidth(), c.getHeight())
 		val ss = drawSize/2
-		for (s <- stations) {
+		for (s <- stations.asScala) {
 			proj.toPixels(s.pt, p)
 			if (p.x >= 0 && p.y >= 0 && p.x < width && p.y < height) {
 				val srcRect = symbol2rect(s.symbol)
@@ -378,13 +378,13 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		val topright = proj.fromPixels(p.x + 16, p.y - 16)
 		Log.d(TAG, "from " + botleft + " to " + topright)
 		// fetch stations in the tap
-		val list = stations.filter(_.inArea(botleft, topright)).map(_.call)
+		val list = stations.asScala.filter(_.inArea(botleft, topright)).map(_.call)
 		Log.d(TAG, "found " + list.size() + " stations")
 		val result = if (list.size() == 0)
 			false // nothing found, do not revert to superclass
 		else if (list.size() == 1) {
 			// found one entry
-			val call = list.get(0)
+			val call = list(0)
 			Log.d(TAG, "user clicked on " + call)
 			context.openDetails(call)
 			true
@@ -393,7 +393,7 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 			new AlertDialog.Builder(context).setTitle(R.string.map_select)
 				.setItems(list.toArray.asInstanceOf[Array[CharSequence]], new DialogInterface.OnClickListener() {
 					override def onClick(di : DialogInterface, item : Int) {
-						context.openDetails(list.get(item))
+						context.openDetails(list(item))
 					}})
 				.setNegativeButton(android.R.string.cancel, null)
 				.show()
@@ -403,7 +403,7 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 	}
 
 	override def onTap(index : Int) : Boolean = {
-		val s = stations(index)
+		val s = stations.get(index)
 		val target = if (s.origin != null && s.origin != "") s.origin
 			else s.call
 		Log.d(TAG, "user clicked on " + s.call + "/" + target)
@@ -421,7 +421,7 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		while (!c.isAfterLast() && c.getString(COLUMN_CALL) == call) {
 			val lat = c.getInt(COLUMN_LAT)
 			val lon = c.getInt(COLUMN_LON)
-			m.add(new GeoPoint(lat, lon))
+			m += new GeoPoint(lat, lon)
 			c.moveToNext()
 		}
 		m
