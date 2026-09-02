@@ -418,13 +418,6 @@
 <string name="ble_scan_failed">BLE scan failed (code %d).</string>
 <string name="ble_scan_failed_generic">Could not start BLE scan.</string>
 <string name="ble_selected">Selected %s</string>
-<string name="ble_validating">Validating %1$s…</string>
-<string name="ble_validating_attempt">Validating %1$s… attempt %2$d/%3$d</string>
-<string name="ble_validation_connect_failed">Could not connect to the selected BLE device.</string>
-<string name="ble_validation_gatt_failed">BLE validation failed (GATT status %1$d).</string>
-<string name="ble_validation_discovery_failed">Could not start BLE service discovery.</string>
-<string name="ble_validation_discovery_status">BLE service discovery failed (status %1$d).</string>
-<string name="ble_validation_not_kiss">Selected device is not a standard BLE-KISS TNC.</string>
 <string name="ble_error_unsupported">Bluetooth LE KISS requires Android 5.0 or newer.</string>
 <string name="ble_error_no_tnc">Please scan for and select a BLE KISS TNC.</string>
 <string name="ble_error_connect">Could not connect to BLE KISS TNC %s.</string>
