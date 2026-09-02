@@ -406,7 +406,7 @@
 
 <!-- Bluetooth LE KISS settings -->
 <string name="p_ble_scan">Scan for BLE KISS TNC</string>
-<string name="p_ble_scan_summary">Find devices advertising the standard BLE-KISS service</string>
+<string name="p_ble_scan_summary">Find standard BLE-KISS and TWR APRS BLE KISS devices</string>
 <string name="p_ble_tnc_device">BLE TNC address</string>
 <string name="p_ble_tnc_device_summary">Selected BLE KISS TNC; can also be entered manually</string>
 <string name="p_ble_tnc_device_entry">Enter BLE device address</string>
