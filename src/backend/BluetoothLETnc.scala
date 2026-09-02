@@ -366,7 +366,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					characteristic : BluetoothGattCharacteristic,
 					value : Array[Byte]) {
 
-				if (gen == generation && characteristic.getUuid() == RX_UUID)
+				if (gen == generation && activeRxUuid != null && characteristic.getUuid() == activeRxUuid)
 					handleRx(value)
 			}
 
