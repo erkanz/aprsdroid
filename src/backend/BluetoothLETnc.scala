@@ -240,6 +240,38 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					return
 				}
 
+				Log.d(TAG, "GATT service discovery complete; enumerating services")
+				try {
+					val services = cbGatt.getServices()
+					if (services != null) {
+						val it = services.iterator()
+						while (it.hasNext()) {
+							val s = it.next()
+							Log.d(TAG, "GATT SERVICE " + s.getUuid())
+							val chars = s.getCharacteristics()
+							if (chars != null) {
+								val cit = chars.iterator()
+								while (cit.hasNext()) {
+									val ch = cit.next()
+									Log.d(TAG,
+										"GATT CHAR " + ch.getUuid() +
+										" props=0x" + Integer.toHexString(ch.getProperties()) +
+										" perms=0x" + Integer.toHexString(ch.getPermissions()))
+									val descs = ch.getDescriptors()
+									if (descs != null) {
+										val dit = descs.iterator()
+										while (dit.hasNext()) {
+											val d = dit.next()
+											Log.d(TAG, "GATT DESC " + d.getUuid())
+										}
+									}
+								}
+							}
+						}
+				} catch {
+					case t : Throwable => Log.e(TAG, "Unable to enumerate GATT database", t)
+				}
+
 				val kissService = cbGatt.getService(SERVICE_UUID)
 				if (kissService == null) {
 					failConnection(service.getString(R.string.ble_error_service))
