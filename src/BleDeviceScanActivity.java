@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Device picker for the standard BLE-KISS service.
+ * Device picker for BLE-KISS transports supported by APRSdroid:
+ * standard BLE-KISS UUIDs and the TWR APRS Nordic UART Service profile.
  *
  * API 21 bluetooth.le references are kept in Scanner21 so APRSdroid remains
  * loadable on its pre-Lollipop minimum SDK.
@@ -185,8 +186,10 @@ public class BleDeviceScanActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static final class Scanner21 {
-        private static final java.util.UUID KISS_SERVICE_UUID =
+        private static final java.util.UUID STANDARD_KISS_SERVICE_UUID =
                 java.util.UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb");
+        private static final java.util.UUID TWR_NUS_SERVICE_UUID =
+                java.util.UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
         private static final long SCAN_MS = 10000L;
 
         private final BleDeviceScanActivity activity;
@@ -259,13 +262,18 @@ public class BleDeviceScanActivity extends Activity {
                                 .setScanMode(android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY)
                                 .build();
 
+                java.util.ArrayList<android.bluetooth.le.ScanFilter> filters =
+                        new java.util.ArrayList<>();
+                filters.add(new android.bluetooth.le.ScanFilter.Builder()
+                        .setServiceUuid(new android.os.ParcelUuid(STANDARD_KISS_SERVICE_UUID))
+                        .build());
+                filters.add(new android.bluetooth.le.ScanFilter.Builder()
+                        .setServiceUuid(new android.os.ParcelUuid(TWR_NUS_SERVICE_UUID))
+                        .build());
+
                 scanning = true;
                 statusView.setText(R.string.ble_scanning);
-                // Do not filter at the scanner level. Some otherwise compatible
-                // BLE-KISS implementations expose the standard GATT service but
-                // omit the service UUID from advertisements. We validate the
-                // service after connecting instead.
-                scanner.startScan(null, settings, callback);
+                scanner.startScan(filters, settings, callback);
 
                 handler.postDelayed(() -> {
                     stop();
@@ -302,7 +310,9 @@ public class BleDeviceScanActivity extends Activity {
                 if (result.getScanRecord() != null &&
                         result.getScanRecord().getServiceUuids() != null) {
                     for (android.os.ParcelUuid uuid : result.getScanRecord().getServiceUuids()) {
-                        if (KISS_SERVICE_UUID.equals(uuid.getUuid())) {
+                        java.util.UUID value = uuid.getUuid();
+                        if (STANDARD_KISS_SERVICE_UUID.equals(value) ||
+                                TWR_NUS_SERVICE_UUID.equals(value)) {
                             advertisesKiss = true;
                             break;
                         }
