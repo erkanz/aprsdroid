@@ -11,7 +11,8 @@ import _root_.java.util.concurrent.atomic.AtomicReference
 import _root_.net.ab0oo.aprs.parser._
 
 /**
- * Standard BLE-KISS transport.
+ * BLE-KISS transport supporting both the standard BLE-KISS UUID profile and
+ * the TWR APRS Nordic UART Service (NUS) profile.
  *
  * BLE GATT packet boundaries are intentionally hidden from KissProto. RX
  * notifications are exposed as a continuous blocking byte stream; TX KISS
@@ -22,9 +23,18 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 
 	val TAG = "APRSdroid.BLEKISS"
 
-	val SERVICE_UUID = UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb")
-	val RX_UUID = UUID.fromString("00000003-ba2a-46c9-ae49-01b0961f68bb")
-	val TX_UUID = UUID.fromString("00000002-ba2a-46c9-ae49-01b0961f68bb")
+	val STANDARD_SERVICE_UUID = UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb")
+	val STANDARD_TX_UUID = UUID.fromString("00000002-ba2a-46c9-ae49-01b0961f68bb")
+	val STANDARD_RX_UUID = UUID.fromString("00000003-ba2a-46c9-ae49-01b0961f68bb")
+
+	// TWR APRS v0.8.x BLE KISS profile: Nordic UART Service (NUS).
+	// Names are from the Android/host perspective:
+	//   TX = App -> TWR (NUS RX characteristic)
+	//   RX = TWR -> App (NUS TX characteristic)
+	val TWR_NUS_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
+	val TWR_NUS_TX_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
+	val TWR_NUS_RX_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+
 	val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
 	val tncmac = prefs.getString("ble.mac", null)
@@ -99,6 +109,9 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 		@volatile var gatt : BluetoothGatt = null
 		@volatile var rxCharacteristic : BluetoothGattCharacteristic = null
 		@volatile var txCharacteristic : BluetoothGattCharacteristic = null
+		@volatile var activeRxUuid : UUID = null
+		@volatile var activeTxUuid : UUID = null
+		@volatile var activeProfile = "none"
 
 		@volatile var proto : TncProto = null
 		@volatile var input : BLEInputStream = null
@@ -179,13 +192,20 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			if (cbGatt == null || characteristic == null || !connectionActive)
 				return false
 
+			val props = characteristic.getProperties()
+			val writeType =
+				if ((props & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0)
+					BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+				else
+					BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 				cbGatt.writeCharacteristic(
 					characteristic,
 					data,
-					BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT) == 0
+					writeType) == 0
 			} else {
-				characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+				characteristic.setWriteType(writeType)
 				characteristic.setValue(data)
 				cbGatt.writeCharacteristic(characteristic)
 			}
@@ -240,56 +260,46 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					return
 				}
 
-				Log.d(TAG, "GATT service discovery complete; enumerating services")
-				try {
-					val services = cbGatt.getServices()
-					if (services != null) {
-						val it = services.iterator()
-						while (it.hasNext()) {
-							val s = it.next()
-							Log.d(TAG, "GATT SERVICE " + s.getUuid())
-							val chars = s.getCharacteristics()
-							if (chars != null) {
-								val cit = chars.iterator()
-								while (cit.hasNext()) {
-									val ch = cit.next()
-									Log.d(TAG,
-										"GATT CHAR " + ch.getUuid() +
-										" props=0x" + Integer.toHexString(ch.getProperties()) +
-										" perms=0x" + Integer.toHexString(ch.getPermissions()))
-									val descs = ch.getDescriptors()
-									if (descs != null) {
-										val dit = descs.iterator()
-										while (dit.hasNext()) {
-											val d = dit.next()
-											Log.d(TAG, "GATT DESC " + d.getUuid())
-										}
-									}
-								}
-							}
-						}
-				} catch {
-					case t : Throwable => Log.e(TAG, "Unable to enumerate GATT database", t)
-				}
+				val standardService = cbGatt.getService(STANDARD_SERVICE_UUID)
+				val twrNusService = cbGatt.getService(TWR_NUS_SERVICE_UUID)
 
-				val kissService = cbGatt.getService(SERVICE_UUID)
-				if (kissService == null) {
-					failConnection(service.getString(R.string.ble_error_service))
-					return
-				}
+				val selectedService =
+					if (standardService != null) {
+						activeProfile = "standard"
+						activeTxUuid = STANDARD_TX_UUID
+						activeRxUuid = STANDARD_RX_UUID
+						standardService
+					} else if (twrNusService != null) {
+						activeProfile = "twr-nus"
+						activeTxUuid = TWR_NUS_TX_UUID
+						activeRxUuid = TWR_NUS_RX_UUID
+						twrNusService
+					} else {
+						failConnection(service.getString(R.string.ble_error_service))
+						return
+					}
 
-				rxCharacteristic = kissService.getCharacteristic(RX_UUID)
-				txCharacteristic = kissService.getCharacteristic(TX_UUID)
+				rxCharacteristic = selectedService.getCharacteristic(activeRxUuid)
+				txCharacteristic = selectedService.getCharacteristic(activeTxUuid)
 
 				if (rxCharacteristic == null || txCharacteristic == null) {
 					failConnection(service.getString(R.string.ble_error_characteristics))
 					return
 				}
 
+				Log.d(TAG,
+					"BLE KISS profile=" + activeProfile +
+					" service=" + selectedService.getUuid() +
+					" tx=" + activeTxUuid +
+					" rx=" + activeRxUuid)
+
 				val rxProps = rxCharacteristic.getProperties()
 				val txProps = txCharacteristic.getProperties()
+				val txWritable =
+					(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0 ||
+					(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
 				if ((rxProps & BluetoothGattCharacteristic.PROPERTY_NOTIFY) == 0 ||
-				    (txProps & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0) {
+				    !txWritable) {
 					failConnection(service.getString(R.string.ble_error_characteristics))
 					return
 				}
@@ -347,7 +357,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					cbGatt : BluetoothGatt,
 					characteristic : BluetoothGattCharacteristic) {
 
-				if (gen == generation && characteristic.getUuid() == RX_UUID)
+				if (gen == generation && activeRxUuid != null && characteristic.getUuid() == activeRxUuid)
 					handleRx(characteristic.getValue())
 			}
 
@@ -365,7 +375,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					characteristic : BluetoothGattCharacteristic,
 					status : Int) {
 
-				if (gen != generation || characteristic.getUuid() != TX_UUID)
+				if (gen != generation || activeTxUuid == null || characteristic.getUuid() != activeTxUuid)
 					return
 
 				val out = output
@@ -396,6 +406,9 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 
 			rxCharacteristic = null
 			txCharacteristic = null
+			activeRxUuid = null
+			activeTxUuid = null
+			activeProfile = "none"
 		}
 
 		def connectGattOnMainThread(callback : BluetoothGattCallback) : BluetoothGatt = {
