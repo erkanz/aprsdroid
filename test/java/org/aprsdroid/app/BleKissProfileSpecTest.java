@@ -3,6 +3,7 @@ package org.aprsdroid.app;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -21,16 +22,14 @@ public class BleKissProfileSpecTest {
         assertFalse(BleKissProfileSpec.TWR_NUS.rxUuid.equals(BleKissProfileSpec.TWR_NUS.txUuid));
     }
 
-    @Test public void radtelUsesFfe1ForRxAndFf31ForTx() {
+    @Test public void radtelRtx1DebugUsesSharedFfe1() {
         assertEquals("0000ffe0-0000-1000-8000-00805f9b34fb",
                 BleKissProfileSpec.RADTEL_RT950.serviceUuid.toString());
         assertEquals("0000ffe1-0000-1000-8000-00805f9b34fb",
                 BleKissProfileSpec.RADTEL_RT950.rxUuid.toString());
-        assertEquals("0000ff31-0000-1000-8000-00805f9b34fb",
-                BleKissProfileSpec.RADTEL_RT950.txUuid.toString());
-        assertFalse(BleKissProfileSpec.RADTEL_RT950.sameCharacteristic);
-        // FF31 is the dedicated host-to-radio write characteristic. Prefer
-        // acknowledged writes when supported so chunks stay serialized.
-        assertFalse(BleKissProfileSpec.RADTEL_RT950.preferWriteWithoutResponse);
+        assertEquals(BleKissProfileSpec.RADTEL_RT950.rxUuid,
+                BleKissProfileSpec.RADTEL_RT950.txUuid);
+        assertTrue(BleKissProfileSpec.RADTEL_RT950.sameCharacteristic);
+        assertTrue(BleKissProfileSpec.RADTEL_RT950.preferWriteWithoutResponse);
     }
 }
