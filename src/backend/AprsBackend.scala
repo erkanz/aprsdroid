@@ -166,7 +166,13 @@ object AprsBackend {
 		defaultBackendInfo(prefs).create(service, prefs)
 	}
 	def instanciateProto(service : AprsService, is : InputStream, os : OutputStream) : TncProto = {
-		defaultProtoInfo(service.prefs).create(service, is, os)
+		// BluetoothLETnc is a BLE-KISS transport. Do not allow a stale/general
+		// protocol preference (TNC2/Kenwood/etc.) to route binary FFE1 KISS
+		// bytes into the wrong parser.
+		if (service.prefs.getString("link", DEFAULT_LINK) == "ble")
+			new KissProto(service, is, os)
+		else
+			defaultProtoInfo(service.prefs).create(service, is, os)
 	}
 	def prefxml_proto(prefs : PrefsWrapper) = {
 		defaultProtoInfo(prefs).prefxml
