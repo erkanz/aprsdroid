@@ -21,15 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Device picker for BLE-KISS transports supported by APRSdroid:
- * standard BLE-KISS UUIDs and the TWR APRS Nordic UART Service profile.
+ * Device picker for BLE KISS transports.
  *
- * API 21 bluetooth.le references are kept in Scanner21 so APRSdroid remains
- * loadable on its pre-Lollipop minimum SDK.
+ * The picker intentionally scans all BLE advertisements. Some usable TNCs do
+ * not advertise a known KISS service UUID, so filtering at the Android scanner
+ * layer would make them impossible to select. Known standard BLE-KISS and TWR
+ * APRS/NUS advertisements are marked as BLE KISS in the list.
  */
 public class BleDeviceScanActivity extends Activity {
     private static final int REQUEST_BLE_PERMISSIONS = 4201;
@@ -197,7 +198,9 @@ public class BleDeviceScanActivity extends Activity {
         private final ArrayList<String> addresses;
         private final ArrayAdapter<String> listAdapter;
         private final TextView statusView;
-        private final Set<String> seen = new HashSet<>();
+        private final Map<String, Integer> indexByAddress = new HashMap<>();
+        private final Map<String, String> bestNameByAddress = new HashMap<>();
+        private final Map<String, Boolean> kissByAddress = new HashMap<>();
         private final android.os.Handler handler =
                 new android.os.Handler(android.os.Looper.getMainLooper());
 
@@ -262,18 +265,13 @@ public class BleDeviceScanActivity extends Activity {
                                 .setScanMode(android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY)
                                 .build();
 
-                java.util.ArrayList<android.bluetooth.le.ScanFilter> filters =
-                        new java.util.ArrayList<>();
-                filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                        .setServiceUuid(new android.os.ParcelUuid(STANDARD_KISS_SERVICE_UUID))
-                        .build());
-                filters.add(new android.bluetooth.le.ScanFilter.Builder()
-                        .setServiceUuid(new android.os.ParcelUuid(TWR_NUS_SERVICE_UUID))
-                        .build());
-
                 scanning = true;
                 statusView.setText(R.string.ble_scanning);
-                scanner.startScan(filters, settings, callback);
+
+                // Broad scan is intentional. A BLE TNC may expose its KISS
+                // service only after GATT discovery or omit the UUID from its
+                // advertisement. Filtering here would hide such devices.
+                scanner.startScan(null, settings, callback);
 
                 handler.postDelayed(() -> {
                     stop();
@@ -295,36 +293,56 @@ public class BleDeviceScanActivity extends Activity {
             try {
                 BluetoothDevice device = result.getDevice();
                 String address = device.getAddress();
-                if (address == null || !seen.add(address))
+                if (address == null)
                     return;
 
-                String name = null;
-                if (result.getScanRecord() != null)
-                    name = result.getScanRecord().getDeviceName();
-                if (name == null)
-                    name = device.getName();
-                if (name == null || name.trim().isEmpty())
-                    name = activity.getString(R.string.ble_unnamed_device);
+                android.bluetooth.le.ScanRecord record = result.getScanRecord();
+                String observedName = null;
+                if (record != null)
+                    observedName = record.getDeviceName();
+                if (observedName == null || observedName.trim().isEmpty())
+                    observedName = device.getName();
 
-                boolean advertisesKiss = false;
-                if (result.getScanRecord() != null &&
-                        result.getScanRecord().getServiceUuids() != null) {
-                    for (android.os.ParcelUuid uuid : result.getScanRecord().getServiceUuids()) {
+                String bestName = bestNameByAddress.get(address);
+                if (observedName != null && !observedName.trim().isEmpty()) {
+                    bestName = observedName.trim();
+                    bestNameByAddress.put(address, bestName);
+                } else if (bestName == null) {
+                    // Do not call an arbitrary nameless BLE peripheral a KISS
+                    // TNC. If a later scan response contains a real name this
+                    // row is updated in-place rather than duplicated.
+                    bestName = "Unnamed BLE device";
+                    bestNameByAddress.put(address, bestName);
+                }
+
+                boolean advertisesKiss = Boolean.TRUE.equals(kissByAddress.get(address));
+                if (record != null && record.getServiceUuids() != null) {
+                    for (android.os.ParcelUuid uuid : record.getServiceUuids()) {
                         java.util.UUID value = uuid.getUuid();
                         if (STANDARD_KISS_SERVICE_UUID.equals(value) ||
                                 TWR_NUS_SERVICE_UUID.equals(value)) {
                             advertisesKiss = true;
+                            kissByAddress.put(address, true);
                             break;
                         }
                     }
                 }
 
                 String displayName = advertisesKiss
-                        ? activity.getString(R.string.ble_standard_kiss, name)
-                        : name;
+                        ? activity.getString(R.string.ble_standard_kiss, bestName)
+                        : bestName;
+                String label = displayName + "\n" + address;
 
-                labels.add(displayName + "\n" + address);
-                addresses.add(address);
+                Integer index = indexByAddress.get(address);
+                if (index == null) {
+                    index = labels.size();
+                    indexByAddress.put(address, index);
+                    labels.add(label);
+                    addresses.add(address);
+                } else if (index >= 0 && index < labels.size()) {
+                    labels.set(index, label);
+                }
+
                 listAdapter.notifyDataSetChanged();
                 statusView.setText(R.string.ble_scan_choose);
             } catch (SecurityException e) {
