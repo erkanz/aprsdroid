@@ -30,6 +30,9 @@ public class BleKissProfileSpecTest {
         assertEquals(BleKissProfileSpec.RADTEL_RT950.rxUuid,
                 BleKissProfileSpec.RADTEL_RT950.txUuid);
         assertTrue(BleKissProfileSpec.RADTEL_RT950.sameCharacteristic);
-        assertTrue(BleKissProfileSpec.RADTEL_RT950.preferWriteWithoutResponse);
+        // RT950 exposes both WRITE and WRITE_NO_RESPONSE. Prefer the
+        // acknowledged WRITE path so a complete KISS frame is serialized
+        // reliably through the shared FFE1 characteristic.
+        assertFalse(BleKissProfileSpec.RADTEL_RT950.preferWriteWithoutResponse);
     }
 }
