@@ -27,10 +27,8 @@ public final class BleKissProfileSpec {
 
     public static final UUID RADTEL_RT950_SERVICE =
             UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
-    public static final UUID RADTEL_RT950_RX =
+    public static final UUID RADTEL_RT950_DATA =
             UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
-    public static final UUID RADTEL_RT950_TX =
-            UUID.fromString("0000ff31-0000-1000-8000-00805f9b34fb");
 
     public static final BleKissProfileSpec STANDARD = new BleKissProfileSpec(
             STANDARD_ID, STANDARD_SERVICE, STANDARD_RX, STANDARD_TX, false, false);
@@ -39,22 +37,18 @@ public final class BleKissProfileSpec {
             TWR_NUS_ID, TWR_NUS_SERVICE, TWR_NUS_RX, TWR_NUS_TX, false, false);
 
     /**
-     * RT-950 Pro proprietary BLE profile:
-     *   FFE1 = notify/read path from radio to host (RX)
-     *   FF31 = host-to-radio write path (TX)
-     *
-     * FFE1 happens to advertise WRITE as well on tested radios, but independent
-     * RT950 protocol reverse engineering identifies FF31 as the actual TX
-     * characteristic. Treating FFE1 as a shared RX/TX characteristic makes
-     * writes succeed at the GATT layer while the radio ignores them for KISS TX.
+     * Hardware-verified RT-950 receive transport uses FFE1 notifications.
+     * OEM V0.29 does not implement a working host KISS->RF path, so the RTX1
+     * debug bridge also enters through FFE1 writes and is dispatched by the
+     * matching debug firmware before the OEM Bluetooth programming parser.
      */
     public static final BleKissProfileSpec RADTEL_RT950 = new BleKissProfileSpec(
             RADTEL_RT950_ID,
             RADTEL_RT950_SERVICE,
-            RADTEL_RT950_RX,
-            RADTEL_RT950_TX,
-            false,
-            false);
+            RADTEL_RT950_DATA,
+            RADTEL_RT950_DATA,
+            true,
+            true);
 
     /** Detection order preserves the existing standard and TWR behavior. */
     public static final List<BleKissProfileSpec> DETECTION_ORDER =
