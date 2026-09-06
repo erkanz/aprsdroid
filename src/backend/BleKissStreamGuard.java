@@ -81,6 +81,13 @@ public final class BleKissStreamGuard {
                 continue;
             }
 
+            // Once an oversized frame has been reported, discard the rest of
+            // that malformed frame silently until the next FEND. This makes
+            // one reset event correspond to one oversized frame and keeps the
+            // parser resynchronisation deterministic across BLE callbacks.
+            if (droppingOversize)
+                continue;
+
             if (!inFrame) {
                 // Preserve any pre-frame bytes. KissProto owns protocol parsing.
                 out.write(b);
@@ -100,8 +107,7 @@ public final class BleKissStreamGuard {
                 continue;
             }
 
-            if (!droppingOversize)
-                out.write(b);
+            out.write(b);
         }
 
         return out.toByteArray();
