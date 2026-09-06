@@ -42,7 +42,7 @@ public final class BleKissProfileSpec {
             RADTEL_RT950_DATA,
             RADTEL_RT950_DATA,
             true,
-            true);
+            false);
 
     /** Detection order preserves the existing standard and TWR behavior. */
     public static final List<BleKissProfileSpec> DETECTION_ORDER =
