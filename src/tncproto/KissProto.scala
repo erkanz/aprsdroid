@@ -78,8 +78,26 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 						case _ : Exception =>
 					}
 				}
-				Log.w(TAG, "AX.25 parse rejected raw=" + bytesToHex(frame), first)
-				throw first
+
+				// RT950 compatibility fallback: if javAX25 rejects the frame but the
+				// binary frame is still a structurally valid AX.25 UI/no-layer3
+				// packet, render it directly as TNC2. This intentionally does not
+				// parse or repair the APRS information field. AprsService can still
+				// log the packet as Received even when the APRS payload itself is
+				// malformed or unsupported.
+				try {
+					val tnc2 = Ax25Tnc2Compat.decodeUiFrame(frame).trim()
+					Log.w(TAG,
+						"AX.25 accepted by strict UI-frame fallback; raw=" +
+						bytesToHex(frame) + " tnc2=" + tnc2)
+					return tnc2
+				} catch {
+					case fallback : Exception =>
+						Log.w(TAG,
+							"AX.25 parse rejected raw=" + bytesToHex(frame) +
+							" fallback=" + fallback.toString(), first)
+						throw first
+				}
 		}
 	}
 
