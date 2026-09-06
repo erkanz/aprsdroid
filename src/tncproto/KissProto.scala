@@ -1,7 +1,7 @@
 package org.aprsdroid.app
 
 import _root_.android.util.Log
-import _root_.java.io.{InputStream, OutputStream}
+import _root_.java.io.{ByteArrayOutputStream, InputStream, OutputStream}
 
 import _root_.net.ab0oo.aprs.parser._
 
@@ -36,6 +36,53 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 		throw new IllegalArgumentException(service.getString(R.string.e_toolong_callsign))
 	}
 
+	private def bytesToHex(data : Array[Byte]) : String =
+		data.map(b => "%02X".format(b & 0xff)).mkString(" ")
+
+	/**
+	 * Some RT-950 OEM-generated frames omit AX.25 reserved bits 5/6 in the
+	 * address SSID octets. They are semantically fixed bits, so setting them
+	 * before a second parse attempt is safe and preserves C/H, SSID and the
+	 * extension bit. This is only attempted after the normal parser rejects the
+	 * original frame.
+	 */
+	private def normalizeAx25ReservedBits(frame : Array[Byte]) : Array[Byte] = {
+		val fixed = frame.clone()
+		var ssidOffset = 6
+		var addresses = 0
+		var done = false
+		while (!done && ssidOffset < fixed.length && addresses < 10) {
+			val original = fixed(ssidOffset) & 0xff
+			fixed(ssidOffset) = (original | 0x60).toByte
+			done = (original & 0x01) != 0
+			ssidOffset += 7
+			addresses += 1
+		}
+		fixed
+	}
+
+	private def parseAx25(frame : Array[Byte]) : String = {
+		try {
+			Parser.parseAX25(frame).toString().trim()
+		} catch {
+			case first : Exception =>
+				val fixed = normalizeAx25ReservedBits(frame)
+				if (!java.util.Arrays.equals(frame, fixed)) {
+					try {
+						val parsed = Parser.parseAX25(fixed).toString().trim()
+						Log.w(TAG,
+							"AX.25 accepted after reserved-bit normalization; raw=" +
+							bytesToHex(frame))
+						return parsed
+					} catch {
+						case _ : Exception =>
+					}
+				}
+				Log.w(TAG, "AX.25 parse rejected raw=" + bytesToHex(frame), first)
+				throw first
+		}
+	}
+
 	def readPacket() : String = {
 		import Kiss._
 		val buf = scala.collection.mutable.ListBuffer[Byte]()
@@ -46,11 +93,11 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 			ch match {
 			case FEND =>
 				if (buf.length > 0) {
-					Log.d(TAG, "readPacket: sending back %s".format(new String(buf.toArray)))
+					val frame = buf.toArray
 					try {
-						return Parser.parseAX25(buf.toArray).toString().trim()
+						return parseAx25(frame)
 					} catch {
-						case e : Exception => buf.clear()
+						case _ : Exception => buf.clear()
 					}
 				}
 			case FESC => is.read() match {
@@ -60,7 +107,7 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 				}
 			case -1	=> throw new java.io.IOException("KissReader out of data")
 			case 0 =>
-				// hack: ignore 0x00 byte at start of frame, this is the command
+				// Ignore KISS port 0/data command byte at the start of a frame.
 				if (buf.length != 0)
 					buf.append(ch.toByte)
 				else
@@ -80,9 +127,31 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 		""
 	}
 
+	private def escapeKissPayload(payload : Array[Byte]) : Array[Byte] = {
+		import Kiss._
+		val out = new ByteArrayOutputStream(payload.length + 8)
+		payload.foreach { b =>
+			(b & 0xff) match {
+			case FEND =>
+				out.write(FESC)
+				out.write(TFEND)
+			case FESC =>
+				out.write(FESC)
+				out.write(TFESC)
+			case v => out.write(v)
+			}
+		}
+		out.toByteArray()
+	}
+
 	def writePacket(p : APRSPacket) {
 		Log.d(TAG, "writePacket: " + p)
-		val combinedData = Array[Byte](Kiss.FEND.toByte, Kiss.CMD_DATA.toByte) ++ p.toAX25Frame() ++ Array[Byte](Kiss.FEND.toByte)
+		val ax25 = p.toAX25Frame()
+		val escaped = escapeKissPayload(ax25)
+		val combinedData =
+			Array[Byte](Kiss.FEND.toByte, Kiss.CMD_DATA.toByte) ++
+			escaped ++ Array[Byte](Kiss.FEND.toByte)
+		Log.d(TAG, "*** KISS TX len=" + combinedData.length + " hex=" + bytesToHex(combinedData))
 		os.write(combinedData)
 		os.flush()
 	}
