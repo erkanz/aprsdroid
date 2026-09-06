@@ -11,31 +11,23 @@ import _root_.java.util.concurrent.atomic.AtomicReference
 import _root_.net.ab0oo.aprs.parser._
 
 /**
- * BLE-KISS transport supporting both the standard BLE-KISS UUID profile and
- * the TWR APRS Nordic UART Service (NUS) profile.
+ * BLE KISS byte-stream transport.
  *
- * BLE GATT packet boundaries are intentionally hidden from KissProto. RX
- * notifications are exposed as a continuous blocking byte stream; TX KISS
- * bytes are fragmented to the negotiated ATT payload size.
+ * Supported profiles are selected after GATT service discovery:
+ *   - standard BLE-KISS UUID profile
+ *   - TWR APRS Nordic UART Service profile
+ *   - Radtel RT-950 Pro FFE0/FFE1 profile
+ *
+ * BLE notification/write boundaries never have KISS framing meaning. RX bytes
+ * are exposed to the existing KissProto as one ordered blocking InputStream;
+ * TX bytes emitted by KissProto are fragmented only for ATT transport.
  */
 class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 		extends AprsBackend(prefs) {
 
 	val TAG = "APRSdroid.BLEKISS"
-
-	val STANDARD_SERVICE_UUID = UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb")
-	val STANDARD_TX_UUID = UUID.fromString("00000002-ba2a-46c9-ae49-01b0961f68bb")
-	val STANDARD_RX_UUID = UUID.fromString("00000003-ba2a-46c9-ae49-01b0961f68bb")
-
-	// TWR APRS v0.8.x BLE KISS profile: Nordic UART Service (NUS).
-	// Names are from the Android/host perspective:
-	//   TX = App -> TWR (NUS RX characteristic)
-	//   RX = TWR -> App (NUS TX characteristic)
-	val TWR_NUS_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
-	val TWR_NUS_TX_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
-	val TWR_NUS_RX_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
-
 	val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+	val PROFILE_RADTEL_RT950 = BleKissProfileSpec.RADTEL_RT950_ID
 
 	val tncmac = prefs.getString("ble.mac", null)
 	var conn : BleGattThread = null
@@ -70,7 +62,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				service.postAbort(service.getString(R.string.ble_error_connect, tncmac))
 		}
 
-		// Connection setup is asynchronous.
+		// Connection setup is asynchronous. postPosterStarted() is emitted once
+		// the transport has completed notification subscription.
 		false
 	}
 
@@ -96,6 +89,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 		val INITIAL_GATT_ATTEMPTS = 3
 		val GATT_RETRY_DELAY_MS = 750L
 		val GATT_ERROR_133 = 133
+		val NO_RESPONSE_PACE_MS = 20L
 		val stateLock = new Object()
 		val mainHandler = new Handler(Looper.getMainLooper())
 
@@ -109,13 +103,17 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 		@volatile var gatt : BluetoothGatt = null
 		@volatile var rxCharacteristic : BluetoothGattCharacteristic = null
 		@volatile var txCharacteristic : BluetoothGattCharacteristic = null
+		@volatile var activeServiceUuid : UUID = null
 		@volatile var activeRxUuid : UUID = null
 		@volatile var activeTxUuid : UUID = null
 		@volatile var activeProfile = "none"
+		@volatile var preferWriteNoResponse = false
+		@volatile var rxNotifyAttached = false
 
 		@volatile var proto : TncProto = null
 		@volatile var input : BLEInputStream = null
 		@volatile var output : BLEOutputStream = null
+		@volatile var rxGuard : BleKissStreamGuard = null
 
 		def log(message : String) {
 			service.postAddPost(
@@ -185,25 +183,35 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			}
 		}
 
-		def writeCharacteristicCompat(data : Array[Byte]) : Boolean = {
+		def chooseWriteType() : Int = {
+			val characteristic = txCharacteristic
+			if (characteristic == null)
+				return -1
+
+			val props = characteristic.getProperties()
+			val hasWrite = (props & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0
+			val hasWriteNoResponse =
+				(props & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
+
+			if (preferWriteNoResponse && hasWriteNoResponse)
+				BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+			else if (hasWrite)
+				BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+			else if (hasWriteNoResponse)
+				BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+			else
+				-1
+		}
+
+		def writeCharacteristicCompat(data : Array[Byte], writeType : Int) : Boolean = {
 			val cbGatt = gatt
 			val characteristic = txCharacteristic
 
-			if (cbGatt == null || characteristic == null || !connectionActive)
+			if (cbGatt == null || characteristic == null || !connectionActive || writeType < 0)
 				return false
 
-			val props = characteristic.getProperties()
-			val writeType =
-				if ((props & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0)
-					BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-				else
-					BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				cbGatt.writeCharacteristic(
-					characteristic,
-					data,
-					writeType) == 0
+				cbGatt.writeCharacteristic(characteristic, data, writeType) == 0
 			} else {
 				characteristic.setWriteType(writeType)
 				characteristic.setValue(data)
@@ -211,15 +219,131 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			}
 		}
 
+		def bytesToHex(data : Array[Byte]) : String = {
+			val hex = "0123456789ABCDEF"
+			val b = new StringBuilder(data.length * 3)
+			var i = 0
+			while (i < data.length) {
+				if (i > 0)
+					b.append(' ')
+				val v = data(i) & 0xff
+				b.append(hex.charAt((v >>> 4) & 0x0f))
+				b.append(hex.charAt(v & 0x0f))
+				i += 1
+			}
+			b.toString()
+		}
+
+		def shortUuid(uuid : UUID) : String = {
+			if (uuid == null)
+				"-"
+			else {
+				val s = uuid.toString().toUpperCase(java.util.Locale.US)
+				if (s.startsWith("0000") && s.endsWith("-0000-1000-8000-00805F9B34FB"))
+					s.substring(4, 8)
+				else
+					s
+			}
+		}
+
+		def isRadtelProfile : Boolean = activeProfile == PROFILE_RADTEL_RT950
+
 		def handleRx(data : Array[Byte]) {
 			if (data == null || data.length == 0)
 				return
 
 			val in = input
 			if (in != null && connectionActive) {
-				Log.d(TAG, "BLE RX " + data.length + " bytes")
-				in.appendData(data)
+				Log.d(TAG,
+					"*** BLE RX profile=" + activeProfile +
+					" uuid=" + shortUuid(activeRxUuid) +
+					" len=" + data.length +
+					" hex=" + bytesToHex(data))
+
+				val guard = rxGuard
+				val bytes = if (guard != null) guard.filter(data) else data
+				if (bytes != null && bytes.length > 0)
+					in.appendData(bytes)
 			}
+		}
+
+		def makeStreamGuard() : BleKissStreamGuard = {
+			new BleKissStreamGuard(new BleKissStreamGuard.Listener {
+				override def onFrame(length : Int, port : Int, command : Int) {
+					val commandName =
+						if (command == 0) "DATA"
+						else "0x%X".format(command)
+					Log.d(TAG,
+						"*** KISS FRAME RX profile=" + activeProfile +
+						" length=" + length +
+						" port=" + port +
+						" command=" + commandName)
+				}
+
+				override def onReset(reason : String) {
+					Log.w(TAG, "*** KISS RX RESET reason=" + reason)
+				}
+			})
+		}
+
+		def selectProfile(cbGatt : BluetoothGatt) : Boolean = {
+			val profiles = BleKissProfileSpec.DETECTION_ORDER.iterator()
+			var selectedSpec : BleKissProfileSpec = null
+			var selectedService : BluetoothGattService = null
+			var selectedRx : BluetoothGattCharacteristic = null
+			var selectedTx : BluetoothGattCharacteristic = null
+
+			while (profiles.hasNext() && selectedSpec == null) {
+				val spec = profiles.next()
+				val candidateService = cbGatt.getService(spec.serviceUuid)
+				if (candidateService != null) {
+					val candidateRx = candidateService.getCharacteristic(spec.rxUuid)
+					val candidateTx = candidateService.getCharacteristic(spec.txUuid)
+					if (candidateRx != null && candidateTx != null) {
+						val rxProps = candidateRx.getProperties()
+						val txProps = candidateTx.getProperties()
+						val rxNotifies =
+							(rxProps & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0
+						val txWritable =
+							(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0 ||
+							(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
+
+						if (rxNotifies && txWritable) {
+							selectedSpec = spec
+							selectedService = candidateService
+							selectedRx = candidateRx
+							selectedTx = candidateTx
+						}
+					}
+				}
+			}
+
+			if (selectedSpec == null || selectedService == null) {
+				failConnection(service.getString(R.string.ble_error_service))
+				return false
+			}
+
+			activeProfile = selectedSpec.id
+			activeServiceUuid = selectedSpec.serviceUuid
+			activeRxUuid = selectedSpec.rxUuid
+			activeTxUuid = selectedSpec.txUuid
+			preferWriteNoResponse = selectedSpec.preferWriteWithoutResponse
+			rxCharacteristic = selectedRx
+			txCharacteristic = selectedTx
+
+			Log.d(TAG,
+				"BLE KISS profile=" + activeProfile +
+				" service=" + activeServiceUuid +
+				" tx=" + activeTxUuid +
+				" rx=" + activeRxUuid)
+
+			if (isRadtelProfile) {
+				Log.d(TAG,
+					"*** PROFILE=RADTEL_RT950_KISS service=FFE0 rx=FFE1 tx=FFE1 " +
+					"sameCharacteristic=" + (rxCharacteristic eq txCharacteristic))
+			}
+
+			true
 		}
 
 		def makeCallback(gen : Int) = new BluetoothGattCallback {
@@ -260,61 +384,31 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					return
 				}
 
-				val standardService = cbGatt.getService(STANDARD_SERVICE_UUID)
-				val twrNusService = cbGatt.getService(TWR_NUS_SERVICE_UUID)
-
-				val selectedService =
-					if (standardService != null) {
-						activeProfile = "standard"
-						activeTxUuid = STANDARD_TX_UUID
-						activeRxUuid = STANDARD_RX_UUID
-						standardService
-					} else if (twrNusService != null) {
-						activeProfile = "twr-nus"
-						activeTxUuid = TWR_NUS_TX_UUID
-						activeRxUuid = TWR_NUS_RX_UUID
-						twrNusService
-					} else {
-						failConnection(service.getString(R.string.ble_error_service))
-						return
-					}
-
-				rxCharacteristic = selectedService.getCharacteristic(activeRxUuid)
-				txCharacteristic = selectedService.getCharacteristic(activeTxUuid)
-
-				if (rxCharacteristic == null || txCharacteristic == null) {
-					failConnection(service.getString(R.string.ble_error_characteristics))
+				if (!selectProfile(cbGatt))
 					return
-				}
-
-				Log.d(TAG,
-					"BLE KISS profile=" + activeProfile +
-					" service=" + selectedService.getUuid() +
-					" tx=" + activeTxUuid +
-					" rx=" + activeRxUuid)
-
-				val rxProps = rxCharacteristic.getProperties()
-				val txProps = txCharacteristic.getProperties()
-				val txWritable =
-					(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0 ||
-					(txProps & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0
-				if ((rxProps & BluetoothGattCharacteristic.PROPERTY_NOTIFY) == 0 ||
-				    !txWritable) {
-					failConnection(service.getString(R.string.ble_error_characteristics))
-					return
-				}
 
 				if (!cbGatt.setCharacteristicNotification(rxCharacteristic, true)) {
 					failConnection(service.getString(R.string.ble_error_subscribe))
 					return
 				}
+				rxNotifyAttached = true
+
+				if (isRadtelProfile)
+					Log.d(TAG, "*** FFE1 VALUECHANGED HANDLER ATTACHED")
 
 				val cccd = rxCharacteristic.getDescriptor(CCCD_UUID)
-				if (cccd == null ||
-				    !writeDescriptorCompat(
-					    cbGatt,
-					    cccd,
-					    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
+				if (cccd == null) {
+					failConnection(service.getString(R.string.ble_error_subscribe))
+					return
+				}
+
+				if (isRadtelProfile)
+					Log.d(TAG, "*** FFE1 CCCD WRITE START")
+
+				if (!writeDescriptorCompat(
+						cbGatt,
+						cccd,
+						BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
 					failConnection(service.getString(R.string.ble_error_subscribe))
 				}
 			}
@@ -328,15 +422,31 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					return
 
 				if (status != BluetoothGatt.GATT_SUCCESS) {
+					if (isRadtelProfile)
+						Log.d(TAG, "*** FFE1 CCCD WRITE RESULT=Failure status=" + status)
 					failConnection(service.getString(R.string.ble_error_subscribe))
 					return
 				}
 
-				// Default ATT payload is 20 bytes. Become operational immediately,
-				// then raise the TX chunk size if MTU negotiation succeeds.
+				if (isRadtelProfile) {
+					Log.d(TAG, "*** FFE1 CCCD WRITE RESULT=Success")
+					Log.d(TAG, "*** FFE1 NOTIFY ACTIVE")
+				}
+
+				// A BLE connection is not transport-ready until notification CCCD
+				// subscription has completed successfully.
 				markTransportReady()
-				try cbGatt.requestMtu(517) catch {
-					case _ : Throwable =>
+
+				if (isRadtelProfile) {
+					// RT950/HM-10 KISS is hardware-qualified with the default 23-byte
+					// ATT MTU and 20-byte chunks. Do not impose a large MTU request.
+					Log.d(TAG, "*** RADTEL KISS READY")
+				} else {
+					// Existing standard/TWR behavior: become operational first, then
+					// increase TX chunk size if Android and the peripheral accept it.
+					try cbGatt.requestMtu(517) catch {
+						case _ : Throwable =>
+					}
 				}
 			}
 
@@ -357,7 +467,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					cbGatt : BluetoothGatt,
 					characteristic : BluetoothGattCharacteristic) {
 
-				if (gen == generation && activeRxUuid != null && characteristic.getUuid() == activeRxUuid)
+				if (gen == generation && activeRxUuid != null &&
+				    characteristic.getUuid() == activeRxUuid)
 					handleRx(characteristic.getValue())
 			}
 
@@ -366,7 +477,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					characteristic : BluetoothGattCharacteristic,
 					value : Array[Byte]) {
 
-				if (gen == generation && activeRxUuid != null && characteristic.getUuid() == activeRxUuid)
+				if (gen == generation && activeRxUuid != null &&
+				    characteristic.getUuid() == activeRxUuid)
 					handleRx(value)
 			}
 
@@ -375,12 +487,13 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					characteristic : BluetoothGattCharacteristic,
 					status : Int) {
 
-				if (gen != generation || activeTxUuid == null || characteristic.getUuid() != activeTxUuid)
+				if (gen != generation || activeTxUuid == null ||
+				    characteristic.getUuid() != activeTxUuid)
 					return
 
 				val out = output
 				if (out != null)
-					out.onWriteComplete(status == BluetoothGatt.GATT_SUCCESS)
+					out.onGattWriteComplete(status == BluetoothGatt.GATT_SUCCESS)
 			}
 		}
 
@@ -388,6 +501,24 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			generation += 1
 			connectionActive = false
 			transportReady = false
+
+			val oldGatt = gatt
+			val oldRx = rxCharacteristic
+			val hadNotify = rxNotifyAttached
+
+			// Disable the local notification route exactly once for this GATT
+			// generation. Closing the GATT releases the remote CCCD/subscription.
+			if (oldGatt != null && oldRx != null && hadNotify) {
+				try oldGatt.setCharacteristicNotification(oldRx, false) catch {
+					case _ : Throwable =>
+				}
+			}
+			rxNotifyAttached = false
+
+			val guard = rxGuard
+			if (guard != null)
+				guard.reset()
+			rxGuard = null
 
 			val in = input
 			if (in != null)
@@ -397,7 +528,6 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			if (out != null)
 				out.closeStream()
 
-			val oldGatt = gatt
 			gatt = null
 			if (oldGatt != null) {
 				try oldGatt.disconnect() catch { case _ : Throwable => }
@@ -406,9 +536,11 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 
 			rxCharacteristic = null
 			txCharacteristic = null
+			activeServiceUuid = null
 			activeRxUuid = null
 			activeTxUuid = null
 			activeProfile = "none"
+			preferWriteNoResponse = false
 		}
 
 		def connectGattOnMainThread(callback : BluetoothGattCallback) : BluetoothGatt = {
@@ -466,6 +598,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 			lastGattStatus = BluetoothGatt.GATT_SUCCESS
 			input = new BLEInputStream()
 			output = new BLEOutputStream()
+			rxGuard = makeStreamGuard()
 			proto = null
 
 			generation += 1
@@ -486,7 +619,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 
 			waitForTransport()
 			proto = AprsBackend.instanciateProto(service, input, output)
-			Log.d(TAG, "BLE KISS transport ready")
+			Log.d(TAG, "BLE KISS transport ready profile=" + activeProfile)
 		}
 
 		def initConnection() {
@@ -561,6 +694,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 					while (running && connectionActive) {
 						val line = proto.readPacket()
 						Log.d(TAG, "recv: " + line)
+						Log.d(TAG, "*** APRS PACKET ACCEPTED profile=" + activeProfile)
 						service.postSubmit(line)
 					}
 
@@ -641,8 +775,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				if (closed && queue.isEmpty)
 					return -1
 
-				val value = queue.take().intValue()
-				value
+				queue.take().intValue()
 			}
 
 			def closeStream() {
@@ -658,8 +791,10 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 		}
 
 		/**
-		 * Serializes GATT writes and fragments KISS bytes according to the
-		 * current ATT payload size (MTU - 3).
+		 * Serializes GATT writes and fragments KissProto output according to
+		 * the current ATT payload size. RT950 uses write-without-response with
+		 * a paced one-operation queue; other profiles keep response-first
+		 * behavior and are advanced by onCharacteristicWrite.
 		 */
 		class BLEOutputStream extends OutputStream {
 			private val staged = new ByteArrayOutputStream()
@@ -667,6 +802,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 
 			@volatile private var attPayload = 20
 			private var writeInFlight = false
+			private var currentWriteWithResponse = false
+			private var writeSequence = 0L
 			private var closed = false
 
 			def setAttPayload(size : Int) = synchronized {
@@ -707,20 +844,54 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				if (writeInFlight || pending.isEmpty || closed)
 					return
 
-				val chunk = pending.removeFirst()
+				val writeType = chooseWriteType()
+				if (writeType < 0) {
+					pending.clear()
+					failConnection("BLE characteristic is not writable")
+					throw new IOException("BLE characteristic is not writable")
+				}
 
-				if (!writeCharacteristicCompat(chunk)) {
+				val chunk = pending.removeFirst()
+				writeSequence += 1
+				val sequence = writeSequence
+				currentWriteWithResponse =
+					writeType != BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+				writeInFlight = true
+
+				if (!writeCharacteristicCompat(chunk, writeType)) {
+					writeInFlight = false
+					currentWriteWithResponse = false
 					pending.clear()
 					failConnection("BLE characteristic write rejected")
 					throw new IOException("BLE characteristic write rejected")
 				}
 
-				writeInFlight = true
-				Log.d(TAG, "BLE TX " + chunk.length + " bytes")
+				Log.d(TAG,
+					"BLE TX profile=" + activeProfile +
+					" len=" + chunk.length +
+					" type=" +
+					(if (currentWriteWithResponse) "WITH_RESPONSE" else "NO_RESPONSE"))
+
+				if (!currentWriteWithResponse) {
+					// WRITE_NO_RESPONSE has no ATT acknowledgement. Pace the queue and
+					// deliberately do not depend on a vendor-specific callback timing.
+					mainHandler.postDelayed(new Runnable {
+						override def run() {
+							onNoResponsePaced(sequence)
+						}
+					}, NO_RESPONSE_PACE_MS)
+				}
 			}
 
-			def onWriteComplete(success : Boolean) : Unit = synchronized {
+			def onGattWriteComplete(success : Boolean) : Unit = synchronized {
+				// Some Android stacks still issue onCharacteristicWrite for a
+				// no-response command. That callback is ignored; the paced path is
+				// the single owner of completion for that operation.
+				if (!writeInFlight || !currentWriteWithResponse)
+					return
+
 				writeInFlight = false
+				currentWriteWithResponse = false
 
 				if (!success) {
 					pending.clear()
@@ -729,8 +900,18 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				}
 
 				try pump() catch {
-					case e : IOException =>
-						Log.e(TAG, "BLE TX pump failed", e)
+					case e : IOException => Log.e(TAG, "BLE TX pump failed", e)
+				}
+			}
+
+			private def onNoResponsePaced(sequence : Long) : Unit = synchronized {
+				if (closed || !writeInFlight || currentWriteWithResponse ||
+				    sequence != writeSequence)
+					return
+
+				writeInFlight = false
+				try pump() catch {
+					case e : IOException => Log.e(TAG, "BLE TX pump failed", e)
 				}
 			}
 
@@ -739,6 +920,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper)
 				pending.clear()
 				staged.reset()
 				writeInFlight = false
+				currentWriteWithResponse = false
+				writeSequence += 1
 			}
 
 			override def close() {
