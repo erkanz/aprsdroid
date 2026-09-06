@@ -29,8 +29,8 @@ import java.util.Map;
  *
  * The picker intentionally scans all BLE advertisements. Some usable TNCs do
  * not advertise a known KISS service UUID, so filtering at the Android scanner
- * layer would make them impossible to select. Known standard BLE-KISS and TWR
- * APRS/NUS advertisements are marked as BLE KISS in the list.
+ * layer would make them impossible to select. Known standard BLE-KISS, TWR
+ * APRS/NUS, and Radtel RT-950 FFE0 advertisements are marked as BLE KISS.
  */
 public class BleDeviceScanActivity extends Activity {
     private static final int REQUEST_BLE_PERMISSIONS = 4201;
@@ -191,6 +191,8 @@ public class BleDeviceScanActivity extends Activity {
                 java.util.UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb");
         private static final java.util.UUID TWR_NUS_SERVICE_UUID =
                 java.util.UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
+        private static final java.util.UUID RADTEL_RT950_SERVICE_UUID =
+                java.util.UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
         private static final long SCAN_MS = 10000L;
 
         private final BleDeviceScanActivity activity;
@@ -320,7 +322,8 @@ public class BleDeviceScanActivity extends Activity {
                     for (android.os.ParcelUuid uuid : record.getServiceUuids()) {
                         java.util.UUID value = uuid.getUuid();
                         if (STANDARD_KISS_SERVICE_UUID.equals(value) ||
-                                TWR_NUS_SERVICE_UUID.equals(value)) {
+                                TWR_NUS_SERVICE_UUID.equals(value) ||
+                                RADTEL_RT950_SERVICE_UUID.equals(value)) {
                             advertisesKiss = true;
                             kissByAddress.put(address, true);
                             break;
